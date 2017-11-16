@@ -18,6 +18,7 @@ import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.Config;
 import com.mumu.filebrowser.eventbus.EventBus;
 import com.mumu.filebrowser.eventbus.FileUtils;
+import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.eventbus.events.ShowFileEvent;
 import com.mumu.filebrowser.eventbus.events.ShowPathEvent;
@@ -31,6 +32,8 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.mumu.filebrowser.views.IListView.LAYOUT_STYLE_GRID;
+import static com.mumu.filebrowser.views.IListView.LAYOUT_STYLE_LIST;
 
 /**
  * Created by leonardo on 17-11-14.
@@ -103,6 +106,22 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
             } else if (mSelectedState.contains(files[i])) {
                 mSelectedState.remove(files[i]);
             }
+        }
+    }
+
+    @Subscribe
+    public void changeLayout(@NonNull ChangeLayoutEvent event) {
+        if (event.getType() == ChangeLayoutEvent.Companion.getASK()) {
+            int layout;
+            if (event.getLayout() != null) {
+                layout = event.getLayout();
+                mListView.showAs(layout, true);
+            } else if ((layout = mListView.getCurrentLayoutStyle()) == LAYOUT_STYLE_LIST) {
+                mListView.showAsGrid(true);
+            } else if ((layout = mListView.getCurrentLayoutStyle()) == LAYOUT_STYLE_GRID) {
+                mListView.showAsList(true);
+            }
+            EventBus.getInstance().post(new ChangeLayoutEvent(ChangeLayoutEvent.Companion.getACK(), layout));
         }
     }
 

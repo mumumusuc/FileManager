@@ -3,7 +3,6 @@ package com.mumu.filebrowser;
 import android.Manifest;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -15,26 +14,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.eventbus.FileUtils;
-import com.mumu.filebrowser.eventbus.events.EnterPathEvent;
 import com.mumu.filebrowser.eventbus.events.FileOptEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
-import com.mumu.filebrowser.eventbus.events.SwitchStyleEvent;
 import com.mumu.filebrowser.processor.IPathManager;
 import com.mumu.filebrowser.processor.PathManager;
 import com.mumu.filebrowser.eventbus.EventBus;
 import com.mumu.filebrowser.views.IListView;
 import com.mumu.filebrowser.views.IOverview;
+import com.mumu.filebrowser.views.ITools;
 import com.mumu.filebrowser.views.OverviewImpl;
 import com.mumu.filebrowser.views.PathViewImpl;
-
+import com.mumu.filebrowser.views.ToolbarImpl;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
-import static com.mumu.filebrowser.views.IListView.LAYOUT_STYLE_GRID;
-import static com.mumu.filebrowser.views.IListView.LAYOUT_STYLE_LIST;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -54,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.overview_panel)
     View mOverviewPanel;
     IOverview mOverview;
+    ITools mTools;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,33 +89,22 @@ public class MainActivity extends AppCompatActivity
 
         if (mDrawer != null && mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
-        } else /*if (mPath.onBackPressed()) {
+        } else if (mTools.cancelAllActions()) {
             return;
-        } else */ {
+        } else {
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        mTools = new ToolbarImpl(getMenuInflater(),menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (item.getItemId()) {
-            case R.id.action_style_list:
-                EventBus.getInstance().post(new SwitchStyleEvent(LAYOUT_STYLE_LIST));
-                item.setChecked(true);
-                return true;
-            case R.id.action_style_grid:
-                EventBus.getInstance().post(new SwitchStyleEvent(LAYOUT_STYLE_GRID));
-                item.setChecked(true);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return mTools.onActionItemSelected(item);
     }
 
     @Override

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:id="@+id/action_search_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/action_search_root"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp">
+
+        <ImageView
+            android:id="@+id/action_search_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_tool_search" />
+
+        <EditText
+            android:id="@+id/action_search_edit"
+            style="@style/Base.Widget.AppCompat.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:hint="@string/tool_title_search"
+            android:imeOptions="actionSearch"
+            android:minWidth="300dp"
+            android:singleLine="true"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/action_search_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_tool_close"
+            android:visibility="gone" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

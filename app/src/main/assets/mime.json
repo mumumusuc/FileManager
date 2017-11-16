@@ -5,6 +5,7 @@
   "aas": "application/x-authoware-seg",
   "ai": "application/postscript",
   "aif": "audio/x-aiff",
+  "m4a": "audio/mpeg",
   "aifc": "audio/x-aiff",
   "aiff": "audio/x-aiff",
   "als": "audio/X-Alpha5",
