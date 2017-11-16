@@ -12,10 +12,11 @@ import com.mumu.filebrowser.file.IFile;
  */
 
 public interface IPathManager {
-    @Subscribe
-    void open(@NonNull OpenEvent event);
 
-    void openFolder(@NonNull IFile file);
+    void open(@NonNull IFile file);
 
-    void openFile(@NonNull IFile file);
+    void focus(boolean focus, @NonNull IFile file);
+
+    void select(boolean select, @NonNull IFile... files);
+
 }

@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
         if (SCREEN_ORIENTATION == Configuration.ORIENTATION_PORTRAIT) {
             mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         }
-        mPathManager = new PathManager(mListView);
+        mPathManager = new PathManager(this,mListView);
         EventBus.getInstance().register(this);
 
         mOverview = new OverviewImpl(mOverviewPanel);

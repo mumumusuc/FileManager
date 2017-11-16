@@ -15,7 +15,7 @@ import java.util.List;
  * Created by leonardo on 17-11-10.
  */
 
-public interface IListView {
+public interface IListView<T> {
     public static final int LAYOUT_STYLE_LIST = 0;
     public static final int LAYOUT_STYLE_GRID = 1;
 
@@ -32,16 +32,16 @@ public interface IListView {
     public @interface Mode {
     }
 
-    interface OnItemClickListener{
-        void onItemClick(@NonNull View v,@NonNull IFile file);
-        void onItemLongClick(@NonNull View v,@NonNull IFile file);
+    interface OnItemClickListener<T>{
+        void onItemClick(@NonNull View v,@NonNull T file);
+        void onItemLongClick(@NonNull View v,@NonNull T file);
     }
 
     /*list*/
-    void setList(@NonNull List<IFile> list);
+    void setList(@NonNull List<T> list);
 
     @Nullable
-    List<IFile> getList();
+    List<T> getList();
 
     void notifyDataSetChanged();
 
@@ -69,14 +69,12 @@ public interface IListView {
     int getCurrentMode();
 
     /*select*/
-    int getItemSelectedCount();
-
-    void setItemSelected(@Nullable View view, int position, boolean selected);
+    void setItemSelected(@Nullable T item, boolean selected);
 
     void selectAll(boolean selected);
 
     /*add & remove*/
-    void addItem(int position, @NonNull IFile file);
+    void addItem(int position, @NonNull T item);
 
-    void removeItem(@NonNull Integer... positions);
+    void removeItem(@NonNull T... items);
 }

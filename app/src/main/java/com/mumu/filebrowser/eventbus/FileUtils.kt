@@ -15,6 +15,8 @@ import java.io.File
  */
 class FileUtils {
     companion object {
+        var MIME_MAP: Map<String, String>? = null;
+
         fun checkPathLegality(path: String): Boolean = File(path).exists()
 
         fun listFiles(path: String): List<IFile> {
@@ -34,5 +36,8 @@ class FileUtils {
         }
 
         fun getStoragePath(): String = Environment.getExternalStorageDirectory().absolutePath
+
+        fun getMIMEType(suffix: String) = MIME_MAP!!.get(suffix)
+
     }
 }

@@ -24,4 +24,5 @@
     <string name="overview_file_type">FileSuffix：%s</string>
     <string name="overview_file_date">ModifiedDate：%s</string>
     <string name="overview_folder">Folder</string>
+
 </resources>

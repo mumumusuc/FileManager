@@ -59,32 +59,6 @@ public class PathProcessor implements View.OnClickListener, View.OnLongClickList
         mPathView.notifyDataSetChanged();
     }
 
-    public void onFileOptEvent(@NonNull FileOptEvent event) {
-        if (mPathView == null) return;
-        switch (mPathView.getCurrentMode()) {
-            case IListView.MODE_VIEW:
-                //mPathView.addItem(0, IFile.create(FileWrapper.class).setName(String.valueOf(mList.size() + 1)));
-                break;
-            case IListView.MODE_MULTI_SELECT:
-                if (mPathView.getCurrentMode() == IListView.MODE_MULTI_SELECT) {
-                    Set<Integer> del = new HashSet<>();
-                    synchronized (mList = mPathView.getList()) {
-                        for (int i = mList.size() - 1; i >= 0; i--) {
-                            if (((FileWrapper) mList.get(i)).isSelected()) {
-                                del.add(i);
-                            }
-                        }
-                        Log.d(TAG, "onFileOptEvent : delete = " + del);
-                        //TODO delete file,invalidate when successed otherwise toast
-                        mPathView.removeItem(del.toArray(new Integer[0]));
-                        if (mPathView.getItemSelectedCount() == 0) {
-                            mPathView.switchToViewMode(true);
-                        }
-                    }
-                }
-                break;
-        }
-    }
 
     public void onClick(View v) {
 

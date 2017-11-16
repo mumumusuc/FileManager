@@ -135,7 +135,7 @@ public class FileWrapper implements IFile {
             String name = getName();
             int start = name.lastIndexOf(".");
             if (start >= name.length() - 1) return null;
-            return mSuffix = name.substring(start + 1, name.length());
+            return mSuffix = name.substring(start + 1, name.length()).toLowerCase();
         } else {
             return mSuffix;
         }
@@ -182,5 +182,9 @@ public class FileWrapper implements IFile {
 
     public boolean isFocused() {
         return mState == State.FOCUSED;
+    }
+
+    public File asFile() {
+        return mFile;
     }
 }

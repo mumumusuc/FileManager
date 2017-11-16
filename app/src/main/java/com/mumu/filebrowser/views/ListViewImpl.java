@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Created by leonardo on 17-11-10.
  */
 
-public class ListViewImpl extends RecyclerView implements IListView, View.OnClickListener, View.OnLongClickListener {
+public class ListViewImpl extends RecyclerView implements IListView<IFile>, View.OnClickListener, View.OnLongClickListener {
 
     private static final String TAG = ListViewImpl.class.getSimpleName();
 
@@ -56,7 +56,7 @@ public class ListViewImpl extends RecyclerView implements IListView, View.OnClic
     private OnItemClickListener mClickListener;
     @Nullable
     private View.OnLongClickListener mLongClickListener;
-    private Set<Integer> mSelectedState;
+
 
 
     public ListViewImpl(Context context) {
@@ -80,7 +80,6 @@ public class ListViewImpl extends RecyclerView implements IListView, View.OnClic
         setItemAnimator(new DefaultItemAnimator());
         mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         setLayoutManager(mLayoutManager);
-        mSelectedState = new HashSet<>();
     }
 
     @Override
@@ -161,34 +160,23 @@ public class ListViewImpl extends RecyclerView implements IListView, View.OnClic
     }
 
     @Override
-    public int getItemSelectedCount() {
-        return mSelectedState.size();
-    }
-
-    @Override
-    public void setItemSelected(@Nullable View view, int position, boolean selected) {
+    public void setItemSelected(@Nullable IFile file, boolean selected) {
+        checkNotNull(file);
         int target = -1;
         synchronized (mItemList) {
-            if (view != null) {
-                Object tag = view.getTag();
-                if (tag instanceof IFile) {
-                    IFile file = (IFile) tag;
-                    target = mItemList.indexOf(file);
-                    view.setSelected(selected);
-                    SimpleViewHolder holder = (SimpleViewHolder) getChildViewHolder(view);
+            target = mItemList.indexOf(file);
+            View v = null;
+            for(int i = getChildCount()-1;i>=0;i--){
+                if((v = getChildAt(i)).getTag() == file){
+                    v.setSelected(selected);
+                    SimpleViewHolder holder = (SimpleViewHolder) getChildViewHolder(v);
                     holder.mDrawable.setSelected(selected, true);
+                    break;
                 }
-            } else {
-                target = position;
             }
             if (target >= 0 && target < mAdapter.getItemCount()) {
                 Log.d(TAG, "setItemSelected : target = " + target);
-                ((FileWrapper) (mItemList.get(target))).setSelected(selected);
-                if (selected) {
-                    mSelectedState.add(target);
-                } else if (mSelectedState.contains(target)) {
-                    mSelectedState.remove(target);
-                }
+                ((FileWrapper) file).setSelected(selected);
             }
         }
     }
@@ -216,17 +204,10 @@ public class ListViewImpl extends RecyclerView implements IListView, View.OnClic
     }
 
     @Override
-    public void removeItem(@NonNull Integer... positions) {
+    public void removeItem(@NonNull IFile... items) {
+        checkNotNull(items);
         synchronized (mItemList) {
-            Set<IFile> temp = new HashSet<>();
-            for (int i = positions.length - 1; i >= 0; i--) {
-                int index = positions[i] < 0 ? 0 : positions[i] > mItemList.size() ? mItemList.size() : positions[i];
-                temp.add(mItemList.get(index));
-                if (mSelectedState.contains(index)) {
-                    mSelectedState.remove(index);
-                }
-            }
-            for (IFile file : temp) {
+            for (IFile file : items) {
                 if (mItemList.contains(file)) {
                     int index = mItemList.indexOf(file);
                     mItemList.remove(file);
