@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/overview_panel_width"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/overview_panel"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/overview_image"
+        android:layout_width="@dimen/overview_image_size"
+        android:layout_height="@dimen/overview_image_size"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:scaleType="fitCenter"/>
+
+    <TextView
+        android:id="@+id/overview_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="当前文件："
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/overview_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="文件类型："
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/overview_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="文件大小："
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/overview_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="修改时间："
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+</LinearLayout>

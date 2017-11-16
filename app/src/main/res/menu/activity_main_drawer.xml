@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item android:title="@string/menu_category_usual">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_camera"
+                    android:icon="@drawable/ic_menu_camera"
+                    android:title="@string/menu_title_camera" />
+                <item
+                    android:id="@+id/nav_music"
+                    android:icon="@drawable/ic_menu_music"
+                    android:title="@string/menu_title_music" />
+                <item
+                    android:id="@+id/nav_picture"
+                    android:icon="@drawable/ic_menu_gallery"
+                    android:title="@string/menu_title_picture" />
+                <item
+                    android:id="@+id/nav_video"
+                    android:icon="@drawable/ic_menu_slideshow"
+                    android:title="@string/menu_title_video" />
+                <item
+                    android:id="@+id/nav_document"
+                    android:icon="@drawable/ic_menu_doc"
+                    android:title="@string/menu_title_document" />
+                <item
+                    android:id="@+id/nav_download"
+                    android:icon="@drawable/ic_menu_download"
+                    android:title="@string/menu_title_download" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="@string/menu_category_device">
+        <menu>
+            <item
+                android:id="@+id/nav_storage"
+                android:icon="@drawable/ic_menu_storage"
+                android:title="@string/menu_title_storage" />
+        </menu>
+    </item>
+    <item android:title="@string/menu_category_other">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_tool_settings"
+                android:title="@string/menu_title_settings" />
+        </menu>
+    </item>
+
+</menu>

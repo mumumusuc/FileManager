@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">FileBrowser</string>
+
+    <string name="menu_title_camera">Camera</string>
+    <string name="menu_title_music">Music</string>
+    <string name="menu_title_picture">Picture</string>
+    <string name="menu_title_video">Video</string>
+    <string name="menu_title_document">Document</string>
+    <string name="menu_title_download">Download</string>
+    <string name="menu_title_storage">Storage</string>
+    <string name="menu_title_settings">Settings</string>
+    <string name="menu_category_usual">Usual</string>
+    <string name="menu_category_other">Other</string>
+    <string name="menu_category_device">Device</string>
+
+    <string name="tool_title_list">List</string>
+    <string name="tool_title_grid">Grid</string>
+    <string name="tool_title_search">Search</string>
+
+    <string name="overview_file_name">CurrentFile：%s</string>
+    <string name="overview_folder_name">CurrentFolder：%s</string>
+    <string name="overview_file_size">FileSize：%s</string>
+    <string name="overview_folder_size">FileCount：%s个</string>
+    <string name="overview_file_type">FileSuffix：%s</string>
+    <string name="overview_file_date">ModifiedDate：%s</string>
+    <string name="overview_folder">Folder</string>
+</resources>
