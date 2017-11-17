@@ -1,7 +1,9 @@
 package com.mumu.filebrowser
 
 import android.app.Application
+import android.os.Environment
 import android.util.Log
+import com.google.android.collect.Maps
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.mumu.filebrowser.eventbus.FileUtils
@@ -35,6 +37,7 @@ class MyApplication : Application() {
                     object : TypeToken<Map<String, String>>() {}.type)
             val end = System.currentTimeMillis()
             Log.i("", String.format("load memi.json use %d ms", end - start))
+
             initialized = true
         }
     }

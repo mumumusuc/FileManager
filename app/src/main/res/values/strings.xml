@@ -1,21 +1,22 @@
 <resources>
     <string name="app_name">FileBrowser</string>
 
-    <string name="alias_camera">Camera</string>
-    <string name="alias_music">Music</string>
-    <string name="alias_picture">Picture</string>
-    <string name="alias_video">Video</string>
-    <string name="alias_document">Document</string>
-    <string name="alias_download">Download</string>
-    <string name="alias_storage">Storage</string>
-    <string name="alias_settings">Settings</string>
+    <string name="alias_camera" translatable="false">camera</string>
+    <string name="alias_music" translatable="false">music</string>
+    <string name="alias_picture" translatable="false">picture</string>
+    <string name="alias_video" translatable="false">video</string>
+    <string name="alias_document" translatable="false">document</string>
+    <string name="alias_download" translatable="false">download</string>
+    <string name="alias_storage" translatable="false">storage</string>
 
-    <string name="menu_title_camera">@string/alias_camera</string>
-    <string name="menu_title_music">@string/alias_music</string>
-    <string name="menu_title_picture">@string/alias_picture</string>
-    <string name="menu_title_video">@string/alias_video</string>
-    <string name="menu_title_document">@string/alias_document</string>
-    <string name="menu_title_download">@string/alias_storage</string>
+    <string name="menu_title_camera">Camera</string>
+    <string name="menu_title_music">Music</string>
+    <string name="menu_title_picture">Picture</string>
+    <string name="menu_title_video">Video</string>
+    <string name="menu_title_document">Document</string>
+    <string name="menu_title_download">Download</string>
+    <string name="menu_title_storage">Storage</string>
+    <string name="menu_title_settings">Settings</string>
 
     <string name="menu_category_usual">Usual</string>
     <string name="menu_category_other">Other</string>

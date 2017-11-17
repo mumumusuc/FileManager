@@ -18,7 +18,6 @@ class FileUtils {
         private val TAG = FileUtils::class.java.simpleName
 
         var MIME_MAP: Map<String, String>? = null
-        var ALIAS_MAP: Map<String, String>? = null
 
         fun checkPathLegality(path: String): Boolean = File(path).exists()
 
@@ -45,7 +44,32 @@ class FileUtils {
             return result
         }
 
-        fun getStoragePath(): String = Environment.getExternalStorageDirectory().absolutePath
+        fun getNavigationPath(alias: String): String? {
+            return when (alias) {
+                "camera" -> {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+                }
+                "music" -> {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).absolutePath
+                }
+                "picture" -> {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath
+                }
+                "video" -> {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).absolutePath
+                }
+                "document" -> {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath
+                }
+                "download" -> {
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+                }
+                "storage" -> {
+                    Environment.getExternalStorageDirectory().absolutePath
+                }
+                else -> null
+            }
+        }
 
         fun getMIMEType(suffix: String) = MIME_MAP!!.get(suffix)
 

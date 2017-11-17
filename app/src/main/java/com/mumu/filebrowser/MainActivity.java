@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity
         mParentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventBus.getInstance().post(new OpenEvent("..",false));
+                EventBus.getInstance().post(new OpenEvent("..", false));
             }
         });
         EventBus.getInstance().register(this);
@@ -123,19 +123,28 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         item.setCheckable(true);
         if (id == R.id.nav_camera) {
-
-        } else if (id == R.id.nav_picture) {
-
-        } else if (id == R.id.nav_video) {
-
-        } else if (id == R.id.nav_document) {
-
-        } else if (id == R.id.nav_download) {
-
-        } else if (id == R.id.nav_storage) {
-            Log.d(TAG, "onNavigationItemSelected -> open storage");
             EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getStoragePath(),false)
+                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_camera)), false)
+            );
+        } else if (id == R.id.nav_picture) {
+            EventBus.getInstance().post(
+                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_picture)), false)
+            );
+        } else if (id == R.id.nav_video) {
+            EventBus.getInstance().post(
+                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_video)), false)
+            );
+        } else if (id == R.id.nav_document) {
+            EventBus.getInstance().post(
+                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_document)), false)
+            );
+        } else if (id == R.id.nav_download) {
+            EventBus.getInstance().post(
+                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_download)), false)
+            );
+        } else if (id == R.id.nav_storage) {
+            EventBus.getInstance().post(
+                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_storage)), false)
             );
         } else if (id == R.id.nav_settings) {
 

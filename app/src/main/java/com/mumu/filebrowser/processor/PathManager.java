@@ -18,6 +18,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.Config;
+import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.eventbus.EventBus;
 import com.mumu.filebrowser.eventbus.FileUtils;
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent;
@@ -150,9 +151,10 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
         mFileList.addAll(mFileOrdering.sortedCopy(FileUtils.Companion.listFiles(file.getPath())));
         mListView.notifyDataSetChanged();
         mCurrentDirection = file;
+        String alias = mContext.getResources().getString(R.string.alias_storage);
         EventBus.getInstance().post(new ShowPathEvent(
                 file.getPath(),
-                Pair.create(FileUtils.Companion.getStoragePath(), "内部存储")));
+                Pair.create(file.getPath(), alias)));
     }
 
     private void openFile(@NonNull IFile file) {
