@@ -7,14 +7,12 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,7 +22,6 @@ import com.google.common.base.Splitter;
 import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.eventbus.events.EnterPathEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.eventbus.events.ShowPathEvent;
 
@@ -100,7 +97,7 @@ public class PathViewImpl extends LinearLayout implements IPathView {
                         public void onClick(View widget) {
                             String target;
                             Toast.makeText(getContext(), target = buildFullPath(sub), Toast.LENGTH_SHORT).show();
-                            EventBus.getInstance().post(new OpenEvent(target));
+                            EventBus.getInstance().post(new OpenEvent(target,false));
                         }
 
                         @Override

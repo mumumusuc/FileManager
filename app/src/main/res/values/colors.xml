@@ -7,7 +7,7 @@
     <color name="pathArrowColor">@android:color/white</color>
     <color name="itemIconColor">@android:color/darker_gray</color>
     <color name="itemNameColor">@android:color/black</color>
-    <color name="itemCaptineColor">@android:color/secondary_text_light</color>
+    <color name="itemCaptineColor">@color/itemNameColor</color>
 
     <color name="colorItemSelected">#403F51B5</color>
     <color name="colorItemSelectedBound">@android:color/transparent</color>

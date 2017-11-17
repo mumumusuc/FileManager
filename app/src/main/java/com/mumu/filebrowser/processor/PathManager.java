@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
@@ -26,9 +28,11 @@ import com.mumu.filebrowser.file.FileWrapper;
 import com.mumu.filebrowser.file.IFile;
 import com.mumu.filebrowser.views.IListView;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -55,6 +59,8 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
         }
     };
     private Set<IFile> mSelectedState;
+    private IFile mCurrentDirection;
+    private PathQueue mQueue;
 
     public PathManager(@NonNull Context context, @NonNull IListView view) {
         checkNotNull(view);
@@ -65,24 +71,36 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
         mListView.setList(mFileList);
         mListView.setOnItemClickListener(this);
         mSelectedState = Sets.newHashSet();
+        mQueue = new PathQueue();
         EventBus.getInstance().register(this);
     }
 
     @Subscribe
     public void open(@NonNull OpenEvent event) {
         String path = event.getPath();
+        checkNotNull(path);
+        if (((mCurrentDirection != null && path.equals(mCurrentDirection.getPath())) || mQueue.inQueue(path))
+                && !event.getReload()) {
+            return;
+        }
+        Log.d(TAG, "open -> " + path);
+        if (path.equals("..")) {
+            if (FileUtils.Companion.isTopPath(mCurrentDirection.getPath())) {
+                return;
+            }
+            path = mCurrentDirection.getParent();
+        }
         if (!FileUtils.Companion.checkPathLegality(path)) {
             Log.w(TAG, "open -> illegal path, ignore");
             return;
         }
-        Log.d(TAG, "open -> " + path);
-        IFile file = new FileWrapper(path);
-        open(file);
+        mQueue.postAndRun(path);
     }
 
     @Override
     public void open(@NonNull IFile file) {
         checkNotNull(file);
+
         if (file.isFolder()) {
             openFolder(file);
         } else {
@@ -131,6 +149,7 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
         clearSelectedState();
         mFileList.addAll(mFileOrdering.sortedCopy(FileUtils.Companion.listFiles(file.getPath())));
         mListView.notifyDataSetChanged();
+        mCurrentDirection = file;
         EventBus.getInstance().post(new ShowPathEvent(
                 file.getPath(),
                 Pair.create(FileUtils.Companion.getStoragePath(), "内部存储")));
@@ -183,5 +202,30 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
 
     private void clearSelectedState() {
         mSelectedState.clear();
+    }
+
+    private final class PathQueue {
+        final static int POST_DELAY = 200;
+        Queue<String> sQueue = new ArrayBlockingQueue<String>(10);
+        private Handler mHandler = new Handler(Looper.myLooper());
+
+        boolean inQueue(String value) {
+            return sQueue.contains(value);
+        }
+
+        void postAndRun(String value) {
+            sQueue.offer(value);
+            while (!sQueue.isEmpty()) {
+                final String var = sQueue.poll();
+                if (var != null) {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            open(new FileWrapper(var));
+                        }
+                    }, POST_DELAY);
+                }
+            }
+        }
     }
 }

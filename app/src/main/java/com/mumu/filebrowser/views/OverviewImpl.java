@@ -25,6 +25,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 
 public class OverviewImpl implements IOverview {
+    private static final String TAG = OverviewImpl.class.getName();
+
     @BindView(R.id.overview_name)
     TextView mName;
     @BindView(R.id.overview_type)
@@ -76,18 +78,18 @@ public class OverviewImpl implements IOverview {
         mIcon.setImageDrawable(file.getIcon(mResources));
         String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, file.getName());
         mName.setText(name);
-        String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE+"byte", file.getSize());
+        String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE + "byte", file.getSize());
         mSize.setText(size);
-        String suffix = String.format(FILE_TYPE,isFolder?FOLDER:file.getSuffix());
+        String suffix = String.format(FILE_TYPE, isFolder ? FOLDER : file.getSuffix());
         mType.setText(suffix);
-        String date = String.format(FILE_DATE,file.getLastDate(null));
+        String date = String.format(FILE_DATE, file.getLastDate(null));
         mDate.setText(date);
     }
 
     @Subscribe
     @Override
     public void onShowOverview(@NonNull ShowFileEvent event) {
-        Log.d("", "onFileSelectedEvent");
+        Log.d(TAG, "onShowOverview");
         showOverview(event.getFile());
     }
 }

@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">文件管理</string>
 
-    <string name="menu_title_camera">照片</string>
-    <string name="menu_title_music">音乐</string>
-    <string name="menu_title_picture">图片</string>
-    <string name="menu_title_video">视频</string>
-    <string name="menu_title_document">文档</string>
-    <string name="menu_title_download">下载</string>
+    <string name="alias_camera">照片</string>
+    <string name="alias_music">音乐</string>
+    <string name="alias_picture">图片</string>
+    <string name="alias_video">视频</string>
+    <string name="alias_document">文档</string>
+    <string name="alias_download">下载</string>
+    <string name="alias_storage">内部存储</string>
+
     <string name="menu_title_storage">内部存储</string>
     <string name="menu_title_settings">设置</string>
     <string name="menu_category_usual">常用目录</string>
@@ -16,6 +18,8 @@
     <string name="tool_title_list">列表</string>
     <string name="tool_title_grid">网格</string>
     <string name="tool_title_search">搜索</string>
+    <string name="tool_title_pre">前一路径</string>
+    <string name="tool_title_next"></string>
 
     <string name="overview_file_name">当前文件：%s</string>
     <string name="overview_folder_name">当前文件夹：%s</string>

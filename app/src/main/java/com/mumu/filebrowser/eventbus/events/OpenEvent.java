@@ -8,12 +8,18 @@ import android.support.annotation.NonNull;
 
 public class OpenEvent {
     private String path;
+    private boolean reload = false;
 
-    public OpenEvent(@NonNull String path) {
+    public OpenEvent(@NonNull String path, boolean reload) {
         this.path = path;
+        this.reload = reload;
     }
 
     public String getPath() {
         return path;
+    }
+
+    public boolean getReload() {
+        return reload;
     }
 }

@@ -6,7 +6,6 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="item_icon_size">28dp</dimen>
-    <integer name="item_icon_size">28</integer>
     <dimen name="item_text_size">22sp</dimen>
 
     <dimen name="overview_panel_width">300dp</dimen>

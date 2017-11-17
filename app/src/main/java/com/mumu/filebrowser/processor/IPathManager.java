@@ -2,8 +2,6 @@ package com.mumu.filebrowser.processor;
 
 import android.support.annotation.NonNull;
 
-import com.google.common.eventbus.Subscribe;
-import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.file.IFile;
 
 /**

@@ -5,6 +5,7 @@ import android.support.transition.Scene
 import android.support.transition.TransitionManager
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -16,9 +17,9 @@ import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent
 /**
  * Created by leonardo on 17-11-16.
  */
-class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickListener {
-    val menu = menu!!
+class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickListener, View.OnKeyListener {
 
+    val menu = menu!!
     val changeAction: MenuItem
     val searchAction: MenuItem
     val searchRoot: ViewGroup
@@ -38,7 +39,9 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
         searchEdit = searchRoot.findViewById(R.id.action_search_edit)
         searchSearch.setOnClickListener(this)
         searchClear.setOnClickListener(this)
+        searchEdit.setOnKeyListener(this)
         EventBus.getInstance().register(this)
+
     }
 
     override fun onActionItemSelected(item: MenuItem): Boolean {
@@ -57,6 +60,7 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
             searchEdit.visibility = View.VISIBLE
             searchClear.visibility = View.VISIBLE
             searchBg.setBackgroundResource(R.drawable.search_bg)
+            searchEdit.requestFocus()
         } else {
             searchEdit.visibility = View.GONE
             searchClear.visibility = View.GONE
@@ -75,10 +79,16 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
                 }
             }
             R.id.action_search_clear -> {
-                TransitionManager.beginDelayedTransition(searchRoot, ChangeBounds())
-                expandSearchView(false)
+                searchEdit.setText("")
             }
         }
+    }
+
+    override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+        if ((event!!.action == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_BACK)) {
+            return cancelAllActions()
+        }
+        return false;
     }
 
     private fun isExpand() = searchEdit.visibility == View.VISIBLE
@@ -88,7 +98,12 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
     }
 
     override fun cancelAllActions(): Boolean {
-        return false
+        if (isExpand()) {
+            TransitionManager.beginDelayedTransition(searchRoot, ChangeBounds())
+            expandSearchView(false)
+            return true
+        }
+        return false;
     }
 
     @Subscribe

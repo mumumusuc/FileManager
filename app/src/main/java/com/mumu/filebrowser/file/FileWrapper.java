@@ -148,7 +148,7 @@ public class FileWrapper implements IFile {
 
     @Override
     public long getSize() {
-        return isFolder() ? mFile.list().length : mFile.length();
+        return isFolder() ? (mFile.list() == null ? 0 : mFile.list().length) : mFile.length();
     }
 
     @NonNull

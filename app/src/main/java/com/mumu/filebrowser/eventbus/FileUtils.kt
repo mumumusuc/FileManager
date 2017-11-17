@@ -1,10 +1,8 @@
 package com.mumu.filebrowser.eventbus
 
-import android.content.res.Resources
-import android.os.Build
 import android.os.Environment
-import android.support.annotation.RequiresApi
 import android.util.Log
+import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.Lists
 import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.file.IFile
@@ -14,10 +12,21 @@ import java.io.File
  * Created by leonardo on 17-11-12.
  */
 class FileUtils {
+
+
     companion object {
-        var MIME_MAP: Map<String, String>? = null;
+        private val TAG = FileUtils::class.java.simpleName
+
+        var MIME_MAP: Map<String, String>? = null
+        var ALIAS_MAP: Map<String, String>? = null
 
         fun checkPathLegality(path: String): Boolean = File(path).exists()
+
+        fun isTopPath(path: String): Boolean {
+            checkArgument(checkPathLegality(path))
+            val parent = File(path).parentFile
+            return if (!parent.exists()) true else parent.list() == null
+        }
 
         fun listFiles(path: String): List<IFile> {
             if (!checkPathLegality(path)) {
@@ -30,6 +39,7 @@ class FileUtils {
             if (size > 0) {
                 for (f in list) {
                     result.add(FileWrapper(f))
+                    Log.d(TAG, f.name)
                 }
             }
             return result

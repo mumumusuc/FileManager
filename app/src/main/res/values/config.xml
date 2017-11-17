@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="path_storage" translatable="false"></string>
+    <string name="path_camera" translatable="false"></string>
+    <string name="path_music" translatable="false"></string>
+    <string name="path_picture" translatable="false"></string>
+    <string name="path_video" translatable="false"></string>
+    <string name="path_document" translatable="false"></string>
+    <string name="path_download" translatable="false"></string>
+</resources>

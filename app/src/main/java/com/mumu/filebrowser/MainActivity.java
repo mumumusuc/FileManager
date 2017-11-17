@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,12 +27,15 @@ import com.mumu.filebrowser.views.ITools;
 import com.mumu.filebrowser.views.OverviewImpl;
 import com.mumu.filebrowser.views.PathViewImpl;
 import com.mumu.filebrowser.views.ToolbarImpl;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String TAG = MainActivity.class.getName();
 
     private int SCREEN_ORIENTATION = -1;
     private DrawerLayout mDrawer;
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity
     PathViewImpl mPathView;
     @BindView(R.id.overview_panel)
     View mOverviewPanel;
+    @BindView(R.id.action_parent_path)
+    View mParentButton;
     IOverview mOverview;
     ITools mTools;
 
@@ -65,9 +71,7 @@ public class MainActivity extends AppCompatActivity
         if (SCREEN_ORIENTATION == Configuration.ORIENTATION_PORTRAIT) {
             mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         }
-        mPathManager = new PathManager(this,mListView);
-        EventBus.getInstance().register(this);
-
+        mPathManager = new PathManager(this, mListView);
         mOverview = new OverviewImpl(mOverviewPanel);
         ActivityCompat.requestPermissions(
                 this,
@@ -77,6 +81,13 @@ public class MainActivity extends AppCompatActivity
                 },
                 111);
         onNavigationItemSelected(mNavigationView.getMenu().findItem(R.id.nav_storage));
+        mParentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getInstance().post(new OpenEvent("..",false));
+            }
+        });
+        EventBus.getInstance().register(this);
     }
 
     @OnClick(R.id.fab)
@@ -98,7 +109,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        mTools = new ToolbarImpl(getMenuInflater(),menu);
+        mTools = new ToolbarImpl(getMenuInflater(), menu);
         return true;
     }
 
@@ -111,7 +122,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         item.setCheckable(true);
-        item.setChecked(true);
         if (id == R.id.nav_camera) {
 
         } else if (id == R.id.nav_picture) {
@@ -123,8 +133,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_download) {
 
         } else if (id == R.id.nav_storage) {
+            Log.d(TAG, "onNavigationItemSelected -> open storage");
             EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getStoragePath())
+                    new OpenEvent(FileUtils.Companion.getStoragePath(),false)
             );
         } else if (id == R.id.nav_settings) {
 
