@@ -8,6 +8,8 @@ import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent
+import com.mumu.filebrowser.eventbus.events.FileOptEvent
+import com.mumu.filebrowser.eventbus.events.OpenEvent
 import com.mumu.filebrowser.views.IListView
 import com.mumu.filebrowser.views.ITools
 
@@ -15,12 +17,10 @@ import com.mumu.filebrowser.views.ITools
  * Created by leonardo on 17-11-16.
  */
 class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickListener, View.OnKeyListener {
-
-    val menu = menu!!
     val changeAction: MenuItem
     val searchAction: MenuItem
+    val parentPathAction: MenuItem
     val searchRoot: ViewGroup
-    val searchBg: View
     val searchSearch: View
     val searchClear: View
     val searchEdit: EditText
@@ -29,8 +29,8 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
         inflater.inflate(R.menu.toolbar_tools, menu);
         changeAction = menu.findItem(R.id.action_change_style)
         searchAction = menu.findItem(R.id.action_search)
+        parentPathAction = menu.findItem(R.id.action_path_pre)
         searchRoot = searchAction.actionView as ViewGroup
-        searchBg = searchRoot.findViewById(R.id.action_search_root)
         searchSearch = searchRoot.findViewById(R.id.action_search_search)
         searchClear = searchRoot.findViewById(R.id.action_search_clear)
         searchEdit = searchRoot.findViewById(R.id.action_search_edit)
@@ -38,7 +38,6 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
         searchClear.setOnClickListener(this)
         searchEdit.setOnKeyListener(this)
         EventBus.getInstance().register(this)
-
     }
 
     override fun onActionItemSelected(item: MenuItem): Boolean {
@@ -46,6 +45,10 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
         when (item.itemId) {
             R.id.action_change_style -> {
                 EventBus.getInstance().post(ChangeLayoutEvent(ChangeLayoutEvent.ASK, null))
+                return true
+            }
+            R.id.action_path_pre -> {
+                EventBus.getInstance().post(OpenEvent("..", "..", false))
                 return true
             }
         }
@@ -56,12 +59,10 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
         if (expand) {
             searchEdit.visibility = View.VISIBLE
             searchClear.visibility = View.VISIBLE
-            searchBg.setBackgroundResource(R.drawable.search_bg)
             searchEdit.requestFocus()
         } else {
             searchEdit.visibility = View.GONE
             searchClear.visibility = View.GONE
-            searchBg.background = null
         }
     }
 

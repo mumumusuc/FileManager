@@ -21,12 +21,13 @@
             android:visible="false"
             app:showAsAction="always" />
         <item
-            android:id="@+id/action_selected"
+            android:id="@+id/action_select"
             android:icon="@drawable/ic_tool_select_all"
             android:orderInCategory="3"
             android:title="@string/tool_title_selected"
             app:showAsAction="always" />
     </group>
+
     <group
         android:menuCategory="container"
         android:id="@+id/common_tools"

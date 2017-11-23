@@ -23,5 +23,4 @@ public interface IPathManager {
 
     void setOverview(@NonNull IOverview overview);
 
-    String getCurrentAlias();
 }

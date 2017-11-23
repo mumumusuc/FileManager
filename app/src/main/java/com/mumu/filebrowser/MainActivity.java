@@ -52,8 +52,6 @@ public class MainActivity extends AppCompatActivity
     PathViewImpl mPathView;
     @BindView(R.id.overview_panel)
     View mOverviewPanel;
-    @BindView(R.id.action_parent_path)
-    View mParentButton;
     IOverview mOverview;
     ITools mTools;
     IFileOption mFileOption;
@@ -86,12 +84,6 @@ public class MainActivity extends AppCompatActivity
                 },
                 111);
         onNavigationItemSelected(mNavigationView.getMenu().findItem(R.id.nav_storage));
-        mParentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventBus.getInstance().post(new OpenEvent("..", mPathManager.getCurrentAlias(), false));
-            }
-        });
         EventBus.getInstance().register(this);
     }
 
@@ -113,6 +105,8 @@ public class MainActivity extends AppCompatActivity
             mDrawer.closeDrawer(GravityCompat.START);
         } else if (mTools.cancelAllActions()) {
             return;
+        } else if (Config.Companion.backControlPath()) {
+            EventBus.getInstance().post(new OpenEvent("..", "..", false));
         } else {
             super.onBackPressed();
         }

@@ -36,4 +36,9 @@
     <string name="opt_name_rename">重命名</string>
     <string name="opt_name_create">新建</string>
     <string name="opt_name_delete">删除</string>
+
+    <string name="opt_msg_create">请输入文件名</string>
+    <string name="opt_msg_delete">确认删除选中的文件吗?</string>
+    <string name="opt_msg_rename">请输入新的文件名</string>
+    <string name="opt_msg_paste">确认粘贴到此处吗?</string>
 </resources>

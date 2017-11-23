@@ -83,7 +83,9 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
         String path = event.getPath();
         String alias = event.getAlias();
         checkNotNull(alias);
-        mAlias = alias;
+        if (!alias.equals("..")) {
+            mAlias = alias;
+        }
         if (path == null) {
             path = FileUtils.Companion.getNavigationPath(mAlias);
         }
@@ -149,11 +151,6 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
     @Override
     public void setOverview(@NonNull IOverview overview) {
         //mOverview = overview;
-    }
-
-    @Override
-    public String getCurrentAlias() {
-        return mAlias;
     }
 
     @Subscribe
