@@ -1,4 +1,4 @@
-package com.mumu.filebrowser.views;
+package com.mumu.filebrowser.views.impl;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,17 +13,18 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.base.Splitter;
-import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.eventbus.EventBus;
+import com.mumu.filebrowser.eventbus.FileUtils;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
-import com.mumu.filebrowser.eventbus.events.ShowPathEvent;
+import com.mumu.filebrowser.views.IPathView;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class PathViewImpl extends LinearLayout implements IPathView {
     private List<String> mPath;
     private SpannableStringBuilder mSSB;
     private TextView mText;
+    private String mAlias;
 
     public PathViewImpl(Context context) {
         super(context);
@@ -57,18 +59,18 @@ public class PathViewImpl extends LinearLayout implements IPathView {
         mSSB = new SpannableStringBuilder();
         mText = inflateTextView(null);
         addView(mText);
-        EventBus.getInstance().register(this);
+        mText.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
-    @Subscribe
     @Override
-    public void showPath(@NonNull ShowPathEvent event) {
-        final String path = event.getPath();
+    public void showPath(@NonNull String path, @NonNull String alias) {
         checkNotNull(path);
+        checkNotNull(alias);
+        mAlias = alias;
         //if (mPath.equals(path)) return;
         if (!path.startsWith("/")) return;
-
-        mText.setMovementMethod(LinkMovementMethod.getInstance());
+        Log.i(TAG, "showPath -> " + path);
+        //mText.setText(path);-
         mText.setText(addClickablePart(path), TextView.BufferType.SPANNABLE);
     }
 
@@ -81,9 +83,29 @@ public class PathViewImpl extends LinearLayout implements IPathView {
     private SpannableStringBuilder addClickablePart(String str) {
         mSSB.clear();
         mSSB.clearSpans();
+        String subs = FileUtils.Companion.getNavigationPath(mAlias);
+        Log.d(TAG, str + ", " + subs);
+        str = str.substring(subs.length(), str.length());
         mPath = Splitter.on('/').omitEmptyStrings().splitToList(str);
         if (mPath == null)
             return null;
+        String aliasName = getResources().getString(FileUtils.Companion.getNavigationName(mAlias));
+        mSSB.append(aliasName);
+        mSSB.setSpan(
+                new ClickableSpan() {
+                    @Override
+                    public void onClick(View widget) {
+                        String target;
+                        EventBus.getInstance().post(new OpenEvent(null, mAlias, false));
+                    }
+
+                    @Override
+                    public void updateDrawState(TextPaint ds) {
+                        super.updateDrawState(ds);
+                        ds.setColor(getResources().getColor(R.color.pathArrowColor));
+                        ds.setUnderlineText(false);
+                    }
+                }, 0, aliasName.length(), 0);
         for (int i = 0, size = mPath.size(); i < size; i++) {
             final int start = mSSB.length();
             final String part = mPath.get(i);
@@ -95,9 +117,9 @@ public class PathViewImpl extends LinearLayout implements IPathView {
                     new ClickableSpan() {
                         @Override
                         public void onClick(View widget) {
-                            String target;
-                            Toast.makeText(getContext(), target = buildFullPath(sub), Toast.LENGTH_SHORT).show();
-                            EventBus.getInstance().post(new OpenEvent(target,false));
+                            String target = buildFullPath(sub);
+                            Toast.makeText(getContext(), target, Toast.LENGTH_SHORT).show();
+                            EventBus.getInstance().post(new OpenEvent(target, mAlias, false));
                         }
 
                         @Override
@@ -116,6 +138,7 @@ public class PathViewImpl extends LinearLayout implements IPathView {
         if (pathlist == null)
             return null;
         mSSB.clear();
+        mSSB.append(FileUtils.Companion.getNavigationPath(mAlias));
         for (String str : pathlist) {
             mSSB.append('/').append(str);
         }

@@ -1,18 +1,15 @@
-package com.mumu.filebrowser.views
+package com.mumu.filebrowser.views.impl
 
 import android.support.transition.ChangeBounds
-import android.support.transition.Scene
 import android.support.transition.TransitionManager
-import android.util.Log
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent
+import com.mumu.filebrowser.views.IListView
+import com.mumu.filebrowser.views.ITools
 
 /**
  * Created by leonardo on 17-11-16.
@@ -29,7 +26,7 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickList
     val searchEdit: EditText
 
     init {
-        inflater.inflate(R.menu.main, menu);
+        inflater.inflate(R.menu.toolbar_tools, menu);
         changeAction = menu.findItem(R.id.action_change_style)
         searchAction = menu.findItem(R.id.action_search)
         searchRoot = searchAction.actionView as ViewGroup

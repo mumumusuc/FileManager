@@ -3,6 +3,8 @@ package com.mumu.filebrowser.processor;
 import android.support.annotation.NonNull;
 
 import com.mumu.filebrowser.file.IFile;
+import com.mumu.filebrowser.views.IOverview;
+import com.mumu.filebrowser.views.IPathView;
 
 /**
  * Created by leonardo on 17-11-12.
@@ -17,4 +19,9 @@ public interface IPathManager {
 
     void select(boolean select, @NonNull IFile... files);
 
+    void setPathView(@NonNull IPathView pathView);
+
+    void setOverview(@NonNull IOverview overview);
+
+    String getCurrentAlias();
 }

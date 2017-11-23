@@ -1,29 +1,10 @@
 package com.mumu.filebrowser.file;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.res.Resources;
-import android.graphics.drawable.LayerDrawable;
-import android.os.Build;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.util.FloatProperty;
-import android.util.Log;
-import android.util.Property;
-import android.view.animation.AccelerateInterpolator;
-
-import com.mumu.filebrowser.R;
-
 import java.io.File;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created by leonardo on 17-11-10.
@@ -41,6 +22,9 @@ public interface IFile {
 
     @NonNull
     Drawable getIcon(@NonNull Resources res);
+
+    @NonNull
+    int getIconResource();
 
     @Nullable
     String getSuffix();
@@ -64,4 +48,7 @@ public interface IFile {
      */
     @NonNull
     String getLastDate(@Nullable String format);
+
+    @NonNull
+    File asFile();
 }

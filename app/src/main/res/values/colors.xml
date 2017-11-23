@@ -12,4 +12,5 @@
     <color name="colorItemSelected">#403F51B5</color>
     <color name="colorItemSelectedBound">@android:color/transparent</color>
     <color name="colorItemFocused">?attr/colorPrimary</color>
+    <color name="dividerColor">#9fdddddd</color>
 </resources>

@@ -3,9 +3,9 @@ package com.mumu.filebrowser;
 import android.Manifest;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,18 +15,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mumu.filebrowser.eventbus.FileUtils;
 import com.mumu.filebrowser.eventbus.events.FileOptEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.processor.IPathManager;
 import com.mumu.filebrowser.processor.PathManager;
 import com.mumu.filebrowser.eventbus.EventBus;
+import com.mumu.filebrowser.views.IFileOption;
 import com.mumu.filebrowser.views.IListView;
 import com.mumu.filebrowser.views.IOverview;
 import com.mumu.filebrowser.views.ITools;
-import com.mumu.filebrowser.views.OverviewImpl;
-import com.mumu.filebrowser.views.PathViewImpl;
-import com.mumu.filebrowser.views.ToolbarImpl;
+import com.mumu.filebrowser.views.impl.FileOptionImpl;
+import com.mumu.filebrowser.views.impl.OverviewImpl;
+import com.mumu.filebrowser.views.impl.PathViewImpl;
+import com.mumu.filebrowser.views.impl.ToolbarImpl;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     View mParentButton;
     IOverview mOverview;
     ITools mTools;
+    IFileOption mFileOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,9 @@ public class MainActivity extends AppCompatActivity
         }
         mPathManager = new PathManager(this, mListView);
         mOverview = new OverviewImpl(mOverviewPanel);
+        mFileOption = new FileOptionImpl(mOverviewPanel);
+        mPathManager.setPathView(mPathView);
+        mPathManager.setOverview(new OverviewImpl(mOverviewPanel));
         ActivityCompat.requestPermissions(
                 this,
                 new String[]{
@@ -84,10 +89,16 @@ public class MainActivity extends AppCompatActivity
         mParentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventBus.getInstance().post(new OpenEvent("..", false));
+                EventBus.getInstance().post(new OpenEvent("..", mPathManager.getCurrentAlias(), false));
             }
         });
         EventBus.getInstance().register(this);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mToolbar.setTitle("");
     }
 
     @OnClick(R.id.fab)
@@ -122,32 +133,28 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         item.setCheckable(true);
+        String alias = null;
         if (id == R.id.nav_camera) {
-            EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_camera)), false)
-            );
+            alias = getString(R.string.nav_alias_camera);
+        } else if (id == R.id.nav_music) {
+            alias = getString(R.string.nav_alias_music);
         } else if (id == R.id.nav_picture) {
-            EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_picture)), false)
-            );
+            alias = getString(R.string.nav_alias_picture);
         } else if (id == R.id.nav_video) {
-            EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_video)), false)
-            );
+            alias = getString(R.string.nav_alias_video);
         } else if (id == R.id.nav_document) {
-            EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_document)), false)
-            );
+            alias = getString(R.string.nav_alias_document);
         } else if (id == R.id.nav_download) {
-            EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_download)), false)
-            );
+            alias = getString(R.string.nav_alias_download);
         } else if (id == R.id.nav_storage) {
-            EventBus.getInstance().post(
-                    new OpenEvent(FileUtils.Companion.getNavigationPath(getString(R.string.alias_storage)), false)
-            );
+            alias = getString(R.string.nav_alias_storage);
         } else if (id == R.id.nav_settings) {
 
+        }
+        if (alias != null) {
+            EventBus.getInstance().post(
+                    new OpenEvent(null, alias, false)
+            );
         }
         if (mDrawer != null) {
             mDrawer.closeDrawer(GravityCompat.START);

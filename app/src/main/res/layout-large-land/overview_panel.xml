@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/overview_panel"
+    android:layout_width="@dimen/overview_panel_width"
+    android:layout_height="wrap_content"
+    android:background="@drawable/common_bg"
+    android:backgroundTint="@android:color/background_light"
+    android:elevation="8dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/overview_image"
+        android:layout_width="@dimen/overview_image_size"
+        android:layout_height="@dimen/overview_image_size"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp"
+        android:scaleType="fitCenter" />
+
+    <include layout="@layout/divider_horizental" />
+
+    <LinearLayout
+        android:minHeight="330dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/overview_name"
+            style="@style/OverviewTextTheme" />
+
+        <TextView
+            android:id="@+id/overview_size"
+            style="@style/OverviewTextTheme" />
+
+        <TextView
+            android:id="@+id/overview_type"
+            style="@style/OverviewTextTheme" />
+
+        <TextView
+            android:id="@+id/overview_date"
+            style="@style/OverviewTextTheme" />
+
+        <TextView
+            android:id="@+id/overview_selected_num"
+            style="@style/OverviewTextTheme"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/overview_selected_size"
+            style="@style/OverviewTextTheme"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <include layout="@layout/divider_horizental" />
+
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <android.support.v7.widget.GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:columnCount="3"
+        app:useDefaultMargins="true">
+
+        <TextView
+            android:id="@+id/opt_cut"
+            style="@style/OptTextTheme"
+            android:drawableTop="@drawable/ic_opt_cut"
+            android:text="@string/opt_name_cut"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1" />
+
+        <TextView
+            android:id="@+id/opt_copy"
+            style="@style/OptTextTheme"
+            android:drawableTop="@drawable/ic_opt_copy"
+            android:text="@string/opt_name_copy"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1" />
+
+        <TextView
+            android:id="@+id/opt_paste"
+            style="@style/OptTextTheme"
+            android:drawableTop="@drawable/ic_opt_paste"
+            android:text="@string/opt_name_paste"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1" />
+
+        <TextView
+            android:id="@+id/opt_rename"
+            style="@style/OptTextTheme"
+            android:drawableTop="@drawable/ic_opt_rename"
+            android:text="@string/opt_name_rename"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1" />
+
+
+        <TextView
+            android:id="@+id/opt_create"
+            style="@style/OptTextTheme"
+            android:drawableTop="@drawable/ic_opt_add"
+            android:text="@string/opt_name_create"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1" />
+
+        <TextView
+            android:id="@+id/opt_delete"
+            style="@style/OptTextTheme"
+            android:drawableTop="@drawable/ic_opt_delete"
+            android:text="@string/opt_name_delete"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1" />
+    </android.support.v7.widget.GridLayout>
+
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

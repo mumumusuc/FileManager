@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="@null" />
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
@@ -36,7 +36,7 @@
         <include layout="@layout/content_main" />
 
         <include
-            layout="@layout/overview_panel_header"
+            layout="@layout/overview_panel"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
     </LinearLayout>
@@ -47,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_option_add" />
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_opt_add" />
 
 </android.support.design.widget.CoordinatorLayout>

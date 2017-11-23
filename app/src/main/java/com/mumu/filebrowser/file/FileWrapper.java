@@ -33,7 +33,7 @@ public class FileWrapper implements IFile {
     private int mCategory = Category.UNKNOWN;
     @State.STATE
     private int mState = State.NONE;
-    private Drawable mIcon;
+    private int mIconResource;
 
     static final class Category {
         public final static int MUSIC = 0;
@@ -98,8 +98,13 @@ public class FileWrapper implements IFile {
     @Override
     public Drawable getIcon(@Nullable Resources res) {
         checkNotNull(res);
-        if (mIcon == null) {
-            int id = -1;
+        return res.getDrawable(getIconResource(), null).mutate();
+    }
+
+    @NonNull
+    @Override
+    public int getIconResource() {
+        if (mIconResource <= 0) {
             switch (getCategory()) {
                 case Category.MUSIC:
                     break;
@@ -114,13 +119,11 @@ public class FileWrapper implements IFile {
                 case Category.APK:
                     break;
                 default:
-                    id = isFolder() ? R.drawable.ic_item_floder : R.drawable.ic_item_file;
+                    mIconResource = isFolder() ? R.drawable.ic_item_floder : R.drawable.ic_item_file;
                     break;
             }
-            return mIcon = res.getDrawable(id, null);
-        } else {
-            return mIcon;
         }
+        return mIconResource;
     }
 
     @Override
@@ -184,6 +187,7 @@ public class FileWrapper implements IFile {
         return mState == State.FOCUSED;
     }
 
+    @Override
     public File asFile() {
         return mFile;
     }

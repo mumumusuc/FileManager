@@ -1,8 +1,10 @@
 package com.mumu.filebrowser.eventbus
 
 import android.os.Environment
+import android.support.v4.util.Pair
 import android.util.Log
 import com.google.common.base.Preconditions.checkArgument
+import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Lists
 import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.file.IFile
@@ -18,11 +20,14 @@ class FileUtils {
         private val TAG = FileUtils::class.java.simpleName
 
         var MIME_MAP: Map<String, String>? = null
+        var PATH_TABLE: Map<String, Pair<String, Integer>>? = null
 
         fun checkPathLegality(path: String): Boolean = File(path).exists()
 
-        fun isTopPath(path: String): Boolean {
+        fun isTopPath(path: String, alias: String): Boolean {
             checkArgument(checkPathLegality(path))
+            if (getNavigationPath(alias).equals(path))
+                return true
             val parent = File(path).parentFile
             return if (!parent.exists()) true else parent.list() == null
         }
@@ -45,33 +50,13 @@ class FileUtils {
         }
 
         fun getNavigationPath(alias: String): String? {
-            return when (alias) {
-                "camera" -> {
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
-                }
-                "music" -> {
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).absolutePath
-                }
-                "picture" -> {
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath
-                }
-                "video" -> {
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).absolutePath
-                }
-                "document" -> {
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath
-                }
-                "download" -> {
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
-                }
-                "storage" -> {
-                    Environment.getExternalStorageDirectory().absolutePath
-                }
-                else -> null
-            }
+            return PATH_TABLE!![alias]?.first
+        }
+
+        fun getNavigationName(alias: String): Integer? {
+            return PATH_TABLE!![alias]?.second
         }
 
         fun getMIMEType(suffix: String) = MIME_MAP!!.get(suffix)
-
     }
 }

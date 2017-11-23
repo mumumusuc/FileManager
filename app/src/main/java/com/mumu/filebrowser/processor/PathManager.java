@@ -23,17 +23,17 @@ import com.mumu.filebrowser.eventbus.EventBus;
 import com.mumu.filebrowser.eventbus.FileUtils;
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
-import com.mumu.filebrowser.eventbus.events.ShowFileEvent;
-import com.mumu.filebrowser.eventbus.events.ShowPathEvent;
+import com.mumu.filebrowser.eventbus.events.SelectedEvent;
 import com.mumu.filebrowser.file.FileWrapper;
 import com.mumu.filebrowser.file.IFile;
 import com.mumu.filebrowser.views.IListView;
+import com.mumu.filebrowser.views.IOverview;
+import com.mumu.filebrowser.views.IPathView;
 
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -62,6 +62,8 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
     private Set<IFile> mSelectedState;
     private IFile mCurrentDirection;
     private PathQueue mQueue;
+    private IPathView mPathView;
+    private String mAlias;
 
     public PathManager(@NonNull Context context, @NonNull IListView view) {
         checkNotNull(view);
@@ -79,14 +81,19 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
     @Subscribe
     public void open(@NonNull OpenEvent event) {
         String path = event.getPath();
-        checkNotNull(path);
+        String alias = event.getAlias();
+        checkNotNull(alias);
+        mAlias = alias;
+        if (path == null) {
+            path = FileUtils.Companion.getNavigationPath(mAlias);
+        }
         if (((mCurrentDirection != null && path.equals(mCurrentDirection.getPath())) || mQueue.inQueue(path))
                 && !event.getReload()) {
             return;
         }
         Log.d(TAG, "open -> " + path);
         if (path.equals("..")) {
-            if (FileUtils.Companion.isTopPath(mCurrentDirection.getPath())) {
+            if (FileUtils.Companion.isTopPath(mCurrentDirection.getPath(), mAlias)) {
                 return;
             }
             path = mCurrentDirection.getParent();
@@ -101,7 +108,6 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
     @Override
     public void open(@NonNull IFile file) {
         checkNotNull(file);
-
         if (file.isFolder()) {
             openFolder(file);
         } else {
@@ -112,7 +118,8 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
 
     @Override
     public void focus(boolean focus, @NonNull IFile file) {
-        EventBus.getInstance().post(new ShowFileEvent(focus ? file : null));
+        // mOverview.showOverview(focus ? file : null);
+        EventBus.getInstance().post(new SelectedEvent(focus ? file : null));
     }
 
     @Override
@@ -125,7 +132,28 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
             } else if (mSelectedState.contains(files[i])) {
                 mSelectedState.remove(files[i]);
             }
+            //mOverview.showSelectedView(files);
         }
+        if (mSelectedState.size() == 0) {
+            EventBus.getInstance().post(new SelectedEvent(mCurrentDirection));
+        } else {
+            EventBus.getInstance().post(new SelectedEvent(mSelectedState.toArray(new IFile[0])));
+        }
+    }
+
+    @Override
+    public void setPathView(@NonNull IPathView pathView) {
+        mPathView = pathView;
+    }
+
+    @Override
+    public void setOverview(@NonNull IOverview overview) {
+        //mOverview = overview;
+    }
+
+    @Override
+    public String getCurrentAlias() {
+        return mAlias;
     }
 
     @Subscribe
@@ -151,10 +179,7 @@ public class PathManager implements IPathManager, IListView.OnItemClickListener<
         mFileList.addAll(mFileOrdering.sortedCopy(FileUtils.Companion.listFiles(file.getPath())));
         mListView.notifyDataSetChanged();
         mCurrentDirection = file;
-        String alias = mContext.getResources().getString(R.string.alias_storage);
-        EventBus.getInstance().post(new ShowPathEvent(
-                file.getPath(),
-                Pair.create(file.getPath(), alias)));
+        mPathView.showPath(file.getPath(), mAlias);
     }
 
     private void openFile(@NonNull IFile file) {

@@ -12,4 +12,5 @@
     <dimen name="overview_image_size">268dp</dimen>
 
     <integer name="item_icon_animation_duration">250</integer>
+    <dimen name="divider_width">1dp</dimen>
 </resources>

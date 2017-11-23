@@ -1,9 +1,11 @@
-package com.mumu.filebrowser.views;
+package com.mumu.filebrowser.views.impl;
 
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.graphics.drawable.DrawableWrapper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,8 +13,9 @@ import android.widget.TextView;
 import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.eventbus.events.ShowFileEvent;
+import com.mumu.filebrowser.eventbus.events.SelectedEvent;
 import com.mumu.filebrowser.file.IFile;
+import com.mumu.filebrowser.views.IOverview;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -54,28 +57,28 @@ public class OverviewImpl implements IOverview {
     String FOLDER;
 
     private Resources mResources;
-    private View mParent;
 
     public OverviewImpl(@NonNull View view) {
         checkNotNull(view);
-        mParent = view;
         mResources = view.getResources();
         ButterKnife.bind(this, view);
         EventBus.getInstance().register(this);
     }
 
     private void setSelfVisibility(boolean visible) {
-        mParent.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        int vis = visible ? View.VISIBLE : View.INVISIBLE;
+        mName.setVisibility(vis);
+        mType.setVisibility(vis);
+        mSize.setVisibility(vis);
+        mDate.setVisibility(vis);
+        mIcon.setVisibility(vis);
     }
 
-    private void showOverview(@Nullable IFile file) {
-        if (file == null) {
-            setSelfVisibility(false);
-            return;
-        }
+    @Override
+    public void showOverview(@Nullable IFile file) {
         setSelfVisibility(true);
         boolean isFolder = file.isFolder();
-        mIcon.setImageDrawable(file.getIcon(mResources));
+        mIcon.setImageDrawable(file.getIcon(mResources).mutate());
         String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, file.getName());
         mName.setText(name);
         String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE + "byte", file.getSize());
@@ -86,10 +89,20 @@ public class OverviewImpl implements IOverview {
         mDate.setText(date);
     }
 
-    @Subscribe
     @Override
-    public void onShowOverview(@NonNull ShowFileEvent event) {
-        Log.d(TAG, "onShowOverview");
-        showOverview(event.getFile());
+    public void showSelectedView(@Nullable IFile... files) {
+        setSelfVisibility(true);
+    }
+
+    @Subscribe
+    public void onSelectedEvent(SelectedEvent event) {
+        IFile[] files = event.getFiles();
+        if (files == null || files.length == 0) {
+            setSelfVisibility(false);
+        } else if (files.length == 1) {
+            showOverview(files[0]);
+        } else {
+            showSelectedView(files);
+        }
     }
 }

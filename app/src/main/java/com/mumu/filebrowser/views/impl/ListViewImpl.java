@@ -1,4 +1,4 @@
-package com.mumu.filebrowser.views;
+package com.mumu.filebrowser.views.impl;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -13,7 +15,6 @@ import android.util.AttributeSet;
 import android.util.FloatProperty;
 import android.util.Log;
 import android.util.Property;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,9 @@ import android.widget.TextView;
 import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.file.FileWrapper;
 import com.mumu.filebrowser.file.IFile;
+import com.mumu.filebrowser.views.IListView;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -252,7 +252,7 @@ public class ListViewImpl extends RecyclerView implements IListView<IFile>, View
         public void onBindViewHolder(SimpleViewHolder holder, int position) {
             IFile file = mItemList.get(position);
             holder.mItemName.setText(file.getName());
-            Drawable icon = file.getIcon(getResources());
+            Drawable icon = DrawableCompat.wrap(file.getIcon(getResources()));
             Drawable selectedDrawable = getResources().getDrawable(R.drawable.ic_item_selected, null);
             SelectDrawable drawable = new SelectDrawable(
                     new Drawable[]{
