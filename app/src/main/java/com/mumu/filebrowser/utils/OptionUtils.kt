@@ -1,4 +1,4 @@
-package com.mumu.filebrowser
+package com.mumu.filebrowser.utils
 
 import android.support.annotation.IntDef
 import com.mumu.filebrowser.file.IFile

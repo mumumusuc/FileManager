@@ -18,7 +18,7 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.Config;
 import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.FileUtils;
+import com.mumu.filebrowser.utils.FileUtils;
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.eventbus.events.SelectedEvent;

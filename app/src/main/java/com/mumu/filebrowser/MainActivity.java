@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -59,10 +60,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG,"onCreate");
+        SCREEN_ORIENTATION = getResources().getConfiguration().orientation;
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        SCREEN_ORIENTATION = getResources().getConfiguration().orientation;
         mPathView = new PathViewImpl(this);
         mToolbar.addView(mPathView);
         setSupportActionBar(mToolbar);
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        Log.i(TAG,"onPostCreate");
         super.onPostCreate(savedInstanceState);
         mToolbar.setTitle("");
     }
@@ -114,6 +118,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.i(TAG,"onCreateOptionsMenu");
         mTools = new ToolbarImpl(getMenuInflater(), menu);
         return true;
     }

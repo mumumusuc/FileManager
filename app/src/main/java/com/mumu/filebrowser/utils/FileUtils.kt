@@ -1,4 +1,4 @@
-package com.mumu.filebrowser
+package com.mumu.filebrowser.utils
 
 import android.support.v4.util.Pair
 import android.util.Log

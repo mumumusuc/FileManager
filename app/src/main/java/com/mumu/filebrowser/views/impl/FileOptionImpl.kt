@@ -10,8 +10,8 @@ import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.common.eventbus.Subscribe
-import com.mumu.filebrowser.FileUtils
-import com.mumu.filebrowser.OptionUtils
+import com.mumu.filebrowser.utils.FileUtils
+import com.mumu.filebrowser.utils.OptionUtils
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.SelectedEvent

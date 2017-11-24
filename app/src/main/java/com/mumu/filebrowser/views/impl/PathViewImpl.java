@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.google.common.base.Splitter;
 import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.FileUtils;
+import com.mumu.filebrowser.utils.FileUtils;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.views.IPathView;
 

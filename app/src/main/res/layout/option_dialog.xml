@@ -37,5 +37,5 @@
         android:id="@+id/dialog_editor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/opt_msg_create" />
+        android:singleLine="true"/>
 </LinearLayout>
