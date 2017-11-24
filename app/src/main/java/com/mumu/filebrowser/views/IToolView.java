@@ -8,7 +8,7 @@ import android.view.MenuItem;
  * Created by leonardo on 17-11-12.
  */
 
-public interface ITools {
+public interface IToolView {
     boolean onActionItemSelected(@NonNull MenuItem item);
 
     boolean cancelAllActions();

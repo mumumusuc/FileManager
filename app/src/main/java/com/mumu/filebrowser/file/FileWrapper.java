@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mumu.filebrowser.R;
-import com.mumu.filebrowser.eventbus.FileUtils;
 
 import java.io.File;
 import java.lang.annotation.Retention;

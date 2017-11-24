@@ -1,10 +1,8 @@
-package com.mumu.filebrowser.eventbus
+package com.mumu.filebrowser
 
-import android.os.Environment
 import android.support.v4.util.Pair
 import android.util.Log
 import com.google.common.base.Preconditions.checkArgument
-import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Lists
 import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.file.IFile
@@ -23,6 +21,14 @@ class FileUtils {
         var PATH_TABLE: Map<String, Pair<String, Integer>>? = null
 
         fun checkPathLegality(path: String): Boolean = File(path).exists()
+        fun checkFileName(name: String?): Boolean {
+            Log.d(TAG, "checkFileName -> name=null?" + name)
+            if (name == null || name.isEmpty() || name.length > 255) {
+                Log.d(TAG, "checkFileName ,,, -> " + name)
+                return false;
+            } else
+                return name.matches(Regex("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$"));
+        }
 
         fun isTopPath(path: String, alias: String): Boolean {
             checkArgument(checkPathLegality(path))

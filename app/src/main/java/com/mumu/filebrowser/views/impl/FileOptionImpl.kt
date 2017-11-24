@@ -1,6 +1,5 @@
 package com.mumu.filebrowser.views.impl
 
-import android.content.DialogInterface
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
@@ -8,22 +7,23 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.EditText
+import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 import com.google.common.eventbus.Subscribe
+import com.mumu.filebrowser.FileUtils
+import com.mumu.filebrowser.OptionUtils
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.SelectedEvent
 import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.file.IFile
-import com.mumu.filebrowser.views.IFileOption
-import java.util.zip.Inflater
+import com.mumu.filebrowser.views.IOptionView
 
 /**
  * Created by leonardo on 17-11-22.
  */
 
-class FileOptionImpl constructor(view: View) : IFileOption, View.OnClickListener {
+class FileOptionImpl constructor(view: View) : IOptionView, View.OnClickListener {
 
     val mContext = view.context
     val mCopy: TextView = view.findViewById(R.id.opt_copy)
@@ -34,6 +34,9 @@ class FileOptionImpl constructor(view: View) : IFileOption, View.OnClickListener
     val mDelete: TextView = view.findViewById(R.id.opt_delete)
     var mDialog: AlertDialog? = null
     val mDialogView: View = LayoutInflater.from(mContext).inflate(R.layout.option_dialog, null, false)
+    var mEditor: EditText? = null
+    var mSelector: RadioGroup? = null
+    var mMessage: TextView? = null
 
     init {
         showOptionDepandsOnSelected(0)
@@ -65,11 +68,32 @@ class FileOptionImpl constructor(view: View) : IFileOption, View.OnClickListener
                 showDialog(v)
             }
             mDialog?.getButton(BUTTON_POSITIVE)?.id -> {
-                if (mDialog?.isShowing ?: false)
+                val name = mEditor?.text?.toString()
+                if (onDialogConfirm(name) && mDialog?.isShowing ?: false) {
                     mDialog?.dismiss()
+                }
                 return
             }
         }
+    }
+
+    private fun onDialogConfirm(name: String?): Boolean {
+        val legal: Boolean = FileUtils.checkFileName(name)
+        if (legal) {
+            OptionUtils.create(name,
+                    when (mSelector?.checkedRadioButtonId) {
+                        R.id.opt_create_folder -> {
+                            OptionUtils.CREATE_TYPE_FOLDER
+                        }
+                        else -> {
+                            OptionUtils.CREATE_TYPE_FILE
+                        }
+                    }
+            )
+        } else {
+            showDialogMessage("请检查文件名是否正确", true)
+        }
+        return legal
     }
 
     @Subscribe
@@ -118,6 +142,9 @@ class FileOptionImpl constructor(view: View) : IFileOption, View.OnClickListener
     private fun createDialog() {
         val builder = AlertDialog.Builder(mContext)
         builder.setView(mDialogView)
+        mEditor = mDialogView.findViewById(R.id.dialog_editor)
+        mSelector = mDialogView.findViewById(R.id.dialog_selector)
+        mMessage = mDialogView.findViewById(R.id.dialog_message)
         builder.setNegativeButton("取消", null);
         builder.setPositiveButton("确定", null);
         mDialog = builder.create()
@@ -129,28 +156,48 @@ class FileOptionImpl constructor(view: View) : IFileOption, View.OnClickListener
         }
         when (view) {
             mCreate -> {
-                mDialog?.findViewById<EditText>(R.id.editor)?.hint = mContext.getString(R.string.opt_msg_create)
-                mDialog?.findViewById<View>(R.id.selector)?.visibility = VISIBLE
                 mDialog?.setTitle(R.string.opt_name_create)
+                showDialogMessage(null, false)
+                showDialogSelector(true)
+                showDialogEditor(mContext.getString(R.string.opt_msg_create), true)
             }
             mDelete -> {
                 mDialog?.setTitle(R.string.opt_name_delete)
-                mDialog?.setMessage(mContext.getString(R.string.opt_msg_delete))
+                showDialogMessage(mContext.getString(R.string.opt_msg_delete), true)
+                showDialogSelector(false)
+                showDialogEditor(null, false)
             }
             mRename -> {
                 mDialog?.setTitle(R.string.opt_name_rename)
-                mDialog?.findViewById<View>(R.id.selector)?.visibility = GONE
-                mDialog?.findViewById<EditText>(R.id.editor)?.hint = mContext.getString(R.string.opt_msg_rename)
+                showDialogMessage(mContext.getString(R.string.opt_msg_rename), true)
+                showDialogSelector(false)
+                showDialogEditor(null, false)
             }
             mPaste -> {
                 mDialog?.setTitle(R.string.opt_name_paste)
-                mDialog?.setMessage(mContext.getString(R.string.opt_msg_paste))
+                showDialogMessage(mContext.getString(R.string.opt_msg_paste), true)
+                showDialogSelector(false)
+                showDialogEditor(null, false)
             }
         }
         if (!mDialog!!.isShowing) {
             mDialog!!.show()
             mDialog!!.getButton(BUTTON_POSITIVE).setOnClickListener(this)
         }
+    }
+
+    private fun showDialogMessage(msg: String?, show: Boolean) {
+        mMessage?.visibility = if (show) VISIBLE else GONE
+        mMessage?.text = msg
+    }
+
+    private fun showDialogSelector(show: Boolean) {
+        mSelector?.visibility = if (show) VISIBLE else GONE
+    }
+
+    private fun showDialogEditor(hint: String?, show: Boolean) {
+        mEditor?.visibility = if (show) VISIBLE else GONE
+        mEditor?.hint = hint
     }
 
     override fun copy(from: String, to: String) {

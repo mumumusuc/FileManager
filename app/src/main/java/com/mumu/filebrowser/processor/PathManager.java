@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
-import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.View;
 
@@ -18,9 +17,8 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.Config;
-import com.mumu.filebrowser.R;
 import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.eventbus.FileUtils;
+import com.mumu.filebrowser.FileUtils;
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent;
 import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.eventbus.events.SelectedEvent;

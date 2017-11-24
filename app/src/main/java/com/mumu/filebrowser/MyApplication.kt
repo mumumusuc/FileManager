@@ -6,7 +6,6 @@ import android.support.v4.util.Pair
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.mumu.filebrowser.eventbus.FileUtils
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader

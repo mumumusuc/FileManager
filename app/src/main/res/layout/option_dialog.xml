@@ -5,17 +5,18 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/editor"
+    <TextView
+        android:text="dialog_message"
+        android:id="@+id/dialog_message"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/opt_msg_create" />
+        android:layout_height="wrap_content" />
 
     <RadioGroup
-        android:id="@+id/selector"
-        android:layout_width="wrap_content"
+        android:id="@+id/dialog_selector"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:checkedButton="@+id/opt_create_folder"
+        android:gravity="end"
         android:orientation="horizontal">
 
         <RadioButton
@@ -31,4 +32,10 @@
             android:layout_height="wrap_content"
             android:text="文件" />
     </RadioGroup>
+
+    <EditText
+        android:id="@+id/dialog_editor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/opt_msg_create" />
 </LinearLayout>

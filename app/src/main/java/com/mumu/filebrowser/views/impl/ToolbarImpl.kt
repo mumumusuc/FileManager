@@ -8,15 +8,14 @@ import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent
-import com.mumu.filebrowser.eventbus.events.FileOptEvent
 import com.mumu.filebrowser.eventbus.events.OpenEvent
 import com.mumu.filebrowser.views.IListView
-import com.mumu.filebrowser.views.ITools
+import com.mumu.filebrowser.views.IToolView
 
 /**
  * Created by leonardo on 17-11-16.
  */
-class ToolbarImpl(inflater: MenuInflater, menu: Menu) : ITools, View.OnClickListener, View.OnKeyListener {
+class ToolbarImpl(inflater: MenuInflater, menu: Menu) : IToolView, View.OnClickListener, View.OnKeyListener {
     val changeAction: MenuItem
     val searchAction: MenuItem
     val parentPathAction: MenuItem

@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
  * Created by leonardo on 17-11-12.
  */
 
-public interface IFileOption {
+public interface IOptionView {
     void copy(@NonNull String from, @NonNull String to);
 
     void move(@NonNull String from, @NonNull String to);

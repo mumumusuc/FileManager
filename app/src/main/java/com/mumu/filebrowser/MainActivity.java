@@ -20,10 +20,10 @@ import com.mumu.filebrowser.eventbus.events.OpenEvent;
 import com.mumu.filebrowser.processor.IPathManager;
 import com.mumu.filebrowser.processor.PathManager;
 import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.views.IFileOption;
+import com.mumu.filebrowser.views.IOptionView;
 import com.mumu.filebrowser.views.IListView;
 import com.mumu.filebrowser.views.IOverview;
-import com.mumu.filebrowser.views.ITools;
+import com.mumu.filebrowser.views.IToolView;
 import com.mumu.filebrowser.views.impl.FileOptionImpl;
 import com.mumu.filebrowser.views.impl.OverviewImpl;
 import com.mumu.filebrowser.views.impl.PathViewImpl;
@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.overview_panel)
     View mOverviewPanel;
     IOverview mOverview;
-    ITools mTools;
-    IFileOption mFileOption;
+    IToolView mTools;
+    IOptionView mFileOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
