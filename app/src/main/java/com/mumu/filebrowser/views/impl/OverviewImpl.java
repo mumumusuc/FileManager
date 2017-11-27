@@ -20,6 +20,9 @@ import com.mumu.filebrowser.views.IOverview;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import presenter.IOverviewPresenter;
+import presenter.IPresenter;
+import presenter.impl.OverviewPresenterImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,8 +30,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Created by leonardo on 17-11-14.
  */
 
-public class OverviewImpl implements IOverview {
+public class OverviewImpl implements IOverview, View.OnAttachStateChangeListener {
     private static final String TAG = OverviewImpl.class.getName();
+    private static final IOverviewPresenter sOverviewPresenter = new OverviewPresenterImpl();
 
     @BindView(R.id.overview_name)
     TextView mName;
@@ -38,8 +42,11 @@ public class OverviewImpl implements IOverview {
     TextView mSize;
     @BindView(R.id.overview_date)
     TextView mDate;
+    @BindView(R.id.overview_selected_num)
+    TextView mCounts;
     @BindView(R.id.overview_image)
     ImageView mIcon;
+
 
     @BindString(R.string.overview_file_name)
     String FILE_NAME;
@@ -55,28 +62,42 @@ public class OverviewImpl implements IOverview {
     String FILE_DATE;
     @BindString(R.string.overview_folder)
     String FOLDER;
+    @BindString(R.string.overview_selected_counts)
+    String FILES_SELECTED;
 
     private Resources mResources;
 
     public OverviewImpl(@NonNull View view) {
         checkNotNull(view);
         mResources = view.getResources();
+        view.addOnAttachStateChangeListener(this);
         ButterKnife.bind(this, view);
-        EventBus.getInstance().register(this);
     }
 
-    private void setSelfVisibility(boolean visible) {
-        int vis = visible ? View.VISIBLE : View.INVISIBLE;
+    private void showSelectedContent(boolean show) {
+        int vis = show ? View.VISIBLE : View.GONE;
+        mCounts.setVisibility(vis);
+    }
+
+    private void showFocusedContent(boolean show) {
+        int vis = show ? View.VISIBLE : View.GONE;
         mName.setVisibility(vis);
         mType.setVisibility(vis);
         mSize.setVisibility(vis);
         mDate.setVisibility(vis);
-        mIcon.setVisibility(vis);
+        //mIcon.setVisibility(vis);
     }
 
     @Override
-    public void showOverview(@Nullable IFile file) {
-        setSelfVisibility(true);
+    public void cleanDisplay() {
+        showFocusedContent(false);
+        showSelectedContent(false);
+    }
+
+    @Override
+    public void showFocusedview(@NonNull IFile file) {
+        showFocusedContent(true);
+        showSelectedContent(false);
         boolean isFolder = file.isFolder();
         mIcon.setImageDrawable(file.getIcon(mResources).mutate());
         String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, file.getName());
@@ -90,19 +111,19 @@ public class OverviewImpl implements IOverview {
     }
 
     @Override
-    public void showSelectedView(@Nullable IFile... files) {
-        setSelfVisibility(true);
+    public void showSelectedView(@NonNull IFile... files) {
+        showFocusedContent(false);
+        showSelectedContent(true);
+        mCounts.setText(String.format(FILES_SELECTED, files.length));
     }
 
-    @Subscribe
-    public void onSelectedEvent(SelectedEvent event) {
-        IFile[] files = event.getFiles();
-        if (files == null || files.length == 0) {
-            setSelfVisibility(false);
-        } else if (files.length == 1) {
-            showOverview(files[0]);
-        } else {
-            showSelectedView(files);
-        }
+    @Override
+    public void onViewAttachedToWindow(View v) {
+        ((IPresenter) sOverviewPresenter).bindView(this);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(View v) {
+        ((IPresenter) sOverviewPresenter).bindView(null);
     }
 }

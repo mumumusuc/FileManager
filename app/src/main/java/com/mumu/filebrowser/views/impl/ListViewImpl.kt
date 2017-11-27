@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.mumu.filebrowser.R
@@ -29,36 +30,29 @@ import presenter.impl.ListPresenterImpl
 /**
  * Created by leonardo on 17-11-24.
  */
-class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.OnLongClickListener {
-
+class ListViewImpl : FrameLayout, IListView<IFile>, View.OnClickListener, View.OnLongClickListener {
     companion object {
-        private var sListPresenter: IListPresenter<IFile>? = null
+        private val sListPresenter: IListPresenter<IFile> = ListPresenterImpl()
+        private val EMPTY_TYPE = 99
     }
 
-    private var mAdapter: ListAdatpter? = null
-    private var mLayoutManager: StaggeredGridLayoutManager? = null
+    private var mEmptyView: View? = null
+    private var mRecyclerView: RecyclerView? = null
 
-    constructor(context: Context) : super(context) {
-        init()
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attributes: AttributeSet?) : super(context, attributes)
+    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
+
+    private fun init(view: RecyclerView) {
+        mRecyclerView = view
+        mRecyclerView?.adapter = ListAdapter()
+        mRecyclerView?.itemAnimator = DefaultItemAnimator()
+        mRecyclerView?.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
     }
 
-    constructor(context: Context, attributes: AttributeSet?) : super(context, attributes) {
-        init()
-    }
-
-    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
-        init()
-    }
-
-    private fun init() {
-        if (sListPresenter == null) {
-            sListPresenter = ListPresenterImpl()
-        }
-        mAdapter = ListAdatpter()
-        adapter = mAdapter
-        itemAnimator = DefaultItemAnimator()
-        mLayoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
-        layoutManager = mLayoutManager
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        init(findViewById(R.id.main_list))
     }
 
     override fun onAttachedToWindow() {
@@ -81,29 +75,43 @@ class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.
     }
 
     override fun showAsList(anim: Boolean) {
-        mLayoutManager?.spanCount = 1
+        (mRecyclerView?.layoutManager as StaggeredGridLayoutManager).spanCount = 1
     }
 
     override fun showAsGrid(anim: Boolean) {
-        mLayoutManager?.spanCount = 5
+        (mRecyclerView?.layoutManager as StaggeredGridLayoutManager)?.spanCount = 5
     }
 
     override fun notifyDataSetChanged() {
-        mAdapter?.notifyDataSetChanged()
+        mRecyclerView?.adapter?.notifyDataSetChanged()
+    }
+
+    override fun setEmptyView(v: View) {
+        if (mEmptyView != null) {
+            removeViewAt(0)
+        }
+        mEmptyView = v
+        addView(mEmptyView, 0)
+    }
+
+    override fun setEmptyView(layout: Int) {
+        setEmptyView(View.inflate(context, layout, null))
     }
 
     override fun select(vararg items: IFile?) {
-        if (items == null || items.size == 0) {
+        if (items == null || items.isEmpty()) {
             TODO("disselect all")
         } else {
             items.map {
                 val selected = (it as FileWrapper).isSelected
-                for (i in 0..(childCount - 1)) {
-                    val view = getChildAt(i)
-                    view.isSelected = selected
-                    val holder = getChildViewHolder(view) as SimpleViewHolder
-                    holder.mDrawable?.setSelected(selected, true)
-                    break
+                for (i in 0..(mRecyclerView!!.childCount - 1)) {
+                    val view = mRecyclerView!!.getChildAt(i)
+                    if (it == view.tag) {
+                        view.isSelected = selected
+                        val holder = mRecyclerView?.getChildViewHolder(view) as SimpleViewHolder
+                        holder.mDrawable?.setSelected(selected, true)
+                        break
+                    }
                 }
             }
         }
@@ -114,8 +122,8 @@ class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.
             TODO("disselect all")
         } else {
             val focus = (item as FileWrapper).isFocused
-            for (i in 0..(childCount - 1)) {
-                val view = getChildAt(i)
+            for (i in 0..(mRecyclerView!!.childCount - 1)) {
+                val view = mRecyclerView!!.getChildAt(i)
                 if (focus) view.requestFocus() else view.clearFocus()
                 break
             }
@@ -123,11 +131,11 @@ class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.
     }
 
     /*Adapter*/
-    private inner class ListAdatpter : RecyclerView.Adapter<SimpleViewHolder>() {
+    private inner class ListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(
-                    if (mLayoutManager?.spanCount == 1) R.layout.item_view_list else R.layout.item_view_grid,
+                    if ((mRecyclerView?.layoutManager as StaggeredGridLayoutManager)?.spanCount == 1) R.layout.item_view_list else R.layout.item_view_grid,
                     parent,
                     false)
             val holder = SimpleViewHolder(view)
@@ -136,26 +144,30 @@ class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.
             return holder
         }
 
-        override fun onBindViewHolder(holder: SimpleViewHolder, position: Int) {
-            val file = sListPresenter!!.list.get(position)
-            holder.mItemName!!.setText(file!!.getName())
-            val icon = DrawableCompat.wrap(file!!.getIcon(resources))
-            val selectedDrawable = resources.getDrawable(R.drawable.ic_item_selected, null)
-            val drawable = SelectDrawable(
-                    arrayOf(icon.mutate(), selectedDrawable.mutate()))
-            holder.mDrawable = drawable
-            val selected = (file as FileWrapper).isSelected
-            drawable.setSelected(selected, false)
-            holder.mItem!!.isSelected = selected
-            holder.mItem!!.tag = file
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            if (holder is SimpleViewHolder) {
+                val file = sListPresenter!!.list.get(position)
+                holder.mItemName!!.setText(file!!.getName())
+                val icon = DrawableCompat.wrap(file!!.getIcon(resources))
+                val selectedDrawable = resources.getDrawable(R.drawable.ic_item_selected, null)
+                val drawable = SelectDrawable(
+                        arrayOf(icon.mutate(), selectedDrawable.mutate()))
+                holder.setDrawable(drawable)
+                val selected = (file as FileWrapper).isSelected
+                drawable.setSelected(selected, false)
+                holder.mItem!!.isSelected = selected
+                holder.mItem!!.tag = file
+            }
         }
 
         override fun getItemCount(): Int {
-            return sListPresenter!!.list.size
+            val size = sListPresenter?.list.size
+            mEmptyView?.visibility = if (size == 0) View.VISIBLE else View.GONE
+            return sListPresenter?.list.size
         }
 
         override fun getItemViewType(position: Int): Int {
-            return sListPresenter!!.currentLayoutStyle
+            return sListPresenter?.currentLayoutStyle
         }
     }
 
@@ -164,23 +176,23 @@ class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.
         val mItemName: TextView = itemView.findViewById(R.id.item_name)
         val mItemIcon: ImageView = itemView.findViewById(R.id.item_icon)
         var mDrawable: SelectDrawable? = null
-            set(value) {
-                checkNotNull(value)
-                mDrawable = value
-                mItemIcon!!.setImageDrawable(mDrawable)
-            }
+        fun setDrawable(drawable: SelectDrawable) {
+            mDrawable = drawable
+            mItemIcon.setImageDrawable(mDrawable)
+        }
     }
+
+    internal inner class EmptyViewHolder(emptyView: View?) : RecyclerView.ViewHolder(emptyView)
 
     internal inner class SelectDrawable constructor(layers: Array<Drawable>) : LayerDrawable(layers) {
 
         var animValue: Float = 0F
             set(value) {
-                var value = value
-                if (value < 0) value = 0f
-                if (value > 1f) value = 1f
-                animValue = value
-                getDrawable(0).alpha = ((1f - value) * 255f).toInt()
-                getDrawable(1).alpha = (value * 255f).toInt()
+                var v = value
+                if (value < 0) v = 0f
+                if (value > 1f) v = 1f
+                getDrawable(0).alpha = ((1f - v) * 255f).toInt()
+                getDrawable(1).alpha = (v * 255f).toInt()
                 invalidateSelf()
             }
 
@@ -192,18 +204,15 @@ class ListViewImpl : RecyclerView, IListView<IFile>, View.OnClickListener, View.
             }
         }
 
-
-        fun setSelected(selected: Boolean, needAnim: Boolean) {
-            if (needAnim) {
-                val start: Float = if (selected) 0f else 1f
-                val anim = ObjectAnimator
-                        .ofFloat<SelectDrawable>(this, ALPHA_PROPERTY, start, 1f - start)
-                        .setDuration(resources.getInteger(R.integer.item_icon_animation_duration).toLong())
-                anim.setInterpolator(AccelerateInterpolator())
-                anim.start()
-            } else {
-                animValue = if (selected) 1f else 0f
-            }
+        fun setSelected(selected: Boolean, needAnim: Boolean) = if (needAnim) {
+            val start: Float = if (selected) 0f else 1f
+            val anim = ObjectAnimator
+                    .ofFloat<SelectDrawable>(this, ALPHA_PROPERTY, start, 1f - start)
+                    .setDuration(resources.getInteger(R.integer.item_icon_animation_duration).toLong())
+            anim.interpolator = AccelerateInterpolator()
+            anim.start()
+        } else {
+            animValue = if (selected) 1f else 0f
         }
     }
 }

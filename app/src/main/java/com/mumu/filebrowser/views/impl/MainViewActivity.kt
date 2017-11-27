@@ -6,9 +6,9 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.util.Log
+import android.view.*
+import android.widget.TextView
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.file.IFile
 import com.mumu.filebrowser.views.*
@@ -24,9 +24,6 @@ class MainViewActivity : AppCompatActivity(), IMainView {
         var sMainPresenter: IMainPresenter? = null
     }
 
-    var mToolbar: Toolbar? = null
-    var mListView: IListView<IFile>? = null
-    var mPathView: IPathView? = null
     var mOverView: IOverview? = null
     var mToolView: IToolView? = null
     var mOptionView: IOptionView? = null
@@ -38,10 +35,7 @@ class MainViewActivity : AppCompatActivity(), IMainView {
             sMainPresenter = MainPresenterImpl()
         }
         (sMainPresenter as IPresenter).bindView(this)
-        mToolbar = findViewById(R.id.toolbar)
-        mListView = findViewById<RecyclerView>(R.id.main_list) as ListViewImpl
-        mPathView = PathViewImpl(this)
-        mToolbar?.addView(mPathView as View)
+        setSupportActionBar(findViewById(R.id.toolbar))
         val overviewPanel = findViewById<View>(R.id.overview_panel)
         mOverView = OverviewImpl(overviewPanel)
         mOptionView = FileOptionImpl(overviewPanel)
@@ -53,11 +47,11 @@ class MainViewActivity : AppCompatActivity(), IMainView {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        mToolbar?.title = ""
+        supportActionBar?.title = ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        mToolView = ToolbarImpl(menuInflater, menu)
+        mToolView = ToolViewImpl(menuInflater, menu)
         return true
     }
 
@@ -69,4 +63,5 @@ class MainViewActivity : AppCompatActivity(), IMainView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return mToolView?.onActionItemSelected(item) ?: false
     }
+
 }

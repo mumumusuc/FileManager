@@ -18,9 +18,11 @@ class FileUtils {
         private val TAG = FileUtils::class.java.simpleName
 
         var MIME_MAP: Map<String, String>? = null
-        var PATH_TABLE: Map<String, Pair<String, Integer>>? = null
+        var PATH_TABLE: Map<String, Pair<String, Int>>? = null
 
-        fun checkPathLegality(path: String): Boolean = File(path).exists()
+        fun checkPath(path: String): Boolean = File(path).exists()
+        fun checkCategory(category: String) = PATH_TABLE!!.containsKey(category)
+
         fun checkFileName(name: String?): Boolean {
             Log.d(TAG, "checkFileName -> name=null?" + name)
             if (name == null || name.isEmpty() || name.length > 255) {
@@ -31,7 +33,7 @@ class FileUtils {
         }
 
         fun isTopPath(path: String, alias: String): Boolean {
-            checkArgument(checkPathLegality(path))
+            checkArgument(checkPath(path))
             if (getNavigationPath(alias).equals(path))
                 return true
             val parent = File(path).parentFile
@@ -39,7 +41,7 @@ class FileUtils {
         }
 
         fun listFiles(path: String): List<IFile> {
-            if (!checkPathLegality(path)) {
+            if (!checkPath(path)) {
                 throw IllegalArgumentException("given path not exist")
             }
             var file = File(path);
@@ -59,10 +61,11 @@ class FileUtils {
             return PATH_TABLE!![alias]?.first
         }
 
-        fun getNavigationName(alias: String): Integer? {
+        fun getNavigationName(alias: String): Int? {
             return PATH_TABLE!![alias]?.second
         }
 
-        fun getMIMEType(suffix: String) = MIME_MAP!!.get(suffix)
+        fun getMIMEType(suffix: String?) = MIME_MAP!!.get(suffix)
+
     }
 }

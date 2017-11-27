@@ -17,7 +17,7 @@
     <string name="nav_name_download">Download</string>
     <string name="nav_name_storage">Storage</string>
 
-    <string name="menu_title_camera">@string/nav_alias_camera</string>
+    <string name="menu_title_camera">@string/nav_name_camera</string>
     <string name="menu_title_music">@string/nav_name_music</string>
     <string name="menu_title_picture">@string/nav_name_picture</string>
     <string name="menu_title_video">@string/nav_name_video</string>
@@ -44,6 +44,7 @@
     <string name="overview_file_type">FileSuffix：%s</string>
     <string name="overview_file_date">ModifiedDate：%s</string>
     <string name="overview_folder">Folder</string>
+    <string name="overview_selected_counts">%sfiles selected</string>
 
     <string name="opt_name_copy">copy</string>
     <string name="opt_name_cut">cut</string>
@@ -52,4 +53,5 @@
     <string name="opt_name_create">create</string>
     <string name="opt_name_delete">delete</string>
 
+    <string name="empty">Empty</string>
 </resources>

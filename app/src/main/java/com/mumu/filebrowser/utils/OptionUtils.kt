@@ -17,7 +17,7 @@ class OptionUtils {
         fun move(from: String, to: String) {}
 
         fun rename(from: String, to: String): Boolean {
-            FileUtils.checkPathLegality(from)
+            FileUtils.checkPath(from)
             checkNotNull(to)
             val newfile = File(to)
             when {
@@ -43,7 +43,7 @@ class OptionUtils {
 
         fun create(name: String?, @CreateType type: Long): Boolean {
             if (name == null) return false
-            if (FileUtils.checkPathLegality(name)) {
+            if (FileUtils.checkPath(name)) {
                 return false
             }
             val file = File(name)

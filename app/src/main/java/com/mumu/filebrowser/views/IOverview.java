@@ -1,8 +1,7 @@
 package com.mumu.filebrowser.views;
 
 
-import android.support.annotation.Nullable;
-
+import android.support.annotation.NonNull;
 import com.mumu.filebrowser.file.IFile;
 
 /**
@@ -10,7 +9,9 @@ import com.mumu.filebrowser.file.IFile;
  */
 
 public interface IOverview {
-    void showOverview(@Nullable IFile file);
+    void cleanDisplay();
 
-    void showSelectedView(@Nullable IFile... files);
+    void showFocusedview(@NonNull IFile file);
+
+    void showSelectedView(@NonNull IFile[] files);
 }

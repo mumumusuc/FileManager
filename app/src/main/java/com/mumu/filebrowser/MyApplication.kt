@@ -6,6 +6,8 @@ import android.support.v4.util.Pair
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.mumu.filebrowser.model.IModel.LAYOUT_STYLE_LIST
+import com.mumu.filebrowser.model.impl.ModelImpl
 import com.mumu.filebrowser.utils.FileUtils
 import java.io.BufferedReader
 import java.io.File
@@ -44,53 +46,59 @@ class MyApplication : Application() {
                             getString(R.string.nav_alias_camera),
                             Pair.create(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath,
-                                    R.string.nav_name_camera as Integer)
+                                    R.string.nav_name_camera)
                     ),
                     kotlin.Pair(
                             getString(R.string.nav_alias_music),
                             Pair.create(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).absolutePath,
-                                    R.string.nav_name_music as Integer
+                                    R.string.nav_name_music
                             )
                     ),
                     kotlin.Pair(
                             getString(R.string.nav_alias_picture),
                             Pair.create(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath,
-                                    R.string.nav_name_picture as Integer
+                                    R.string.nav_name_picture
                             )
                     ),
                     kotlin.Pair(
                             getString(R.string.nav_alias_video),
                             Pair.create(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).absolutePath,
-                                    R.string.nav_name_video as Integer
+                                    R.string.nav_name_video
                             )
                     ),
                     kotlin.Pair(
                             getString(R.string.nav_alias_document),
                             Pair.create(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath,
-                                    R.string.nav_name_document as Integer
+                                    R.string.nav_name_document
                             )
                     ),
                     kotlin.Pair(
                             getString(R.string.nav_alias_download),
                             Pair.create(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
-                                    R.string.nav_name_download as Integer
+                                    R.string.nav_name_download
                             )
                     ),
                     kotlin.Pair(
                             getString(R.string.nav_alias_storage),
                             Pair.create(
                                     Environment.getExternalStorageDirectory().absolutePath,
-                                    R.string.nav_name_storage as Integer
+                                    R.string.nav_name_storage
                             )
                     )
             )
             /**/
+            val defaultCategory = getString(R.string.nav_alias_storage)
+            val defaultPath = FileUtils.getNavigationPath(defaultCategory)
+            ModelImpl.init(this, defaultCategory, defaultPath!!)
+            /**/
             checkNavigationPath()
+            /**/
+            ModelImpl.setLayoutStyle(LAYOUT_STYLE_LIST)
             initialized = true
         }
     }

@@ -4,18 +4,20 @@ import android.support.transition.ChangeBounds
 import android.support.transition.TransitionManager
 import android.view.*
 import android.widget.EditText
-import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
-import com.mumu.filebrowser.eventbus.EventBus
-import com.mumu.filebrowser.eventbus.events.ChangeLayoutEvent
-import com.mumu.filebrowser.eventbus.events.OpenEvent
-import com.mumu.filebrowser.views.IListView
 import com.mumu.filebrowser.views.IToolView
+import presenter.IPresenter
+import presenter.IToolPresenter
+import presenter.impl.ToolPresenterImpl
 
 /**
  * Created by leonardo on 17-11-16.
  */
-class ToolbarImpl(inflater: MenuInflater, menu: Menu) : IToolView, View.OnClickListener, View.OnKeyListener {
+class ToolViewImpl(inflater: MenuInflater, menu: Menu) : IToolView, View.OnClickListener, View.OnKeyListener, View.OnAttachStateChangeListener {
+    companion object {
+        private val sToolPresenter: IToolPresenter = ToolPresenterImpl()
+    }
+
     val changeAction: MenuItem
     val searchAction: MenuItem
     val parentPathAction: MenuItem
@@ -36,18 +38,26 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : IToolView, View.OnClickL
         searchSearch.setOnClickListener(this)
         searchClear.setOnClickListener(this)
         searchEdit.setOnKeyListener(this)
-        EventBus.getInstance().register(this)
+        searchSearch.addOnAttachStateChangeListener(this)
+    }
+
+    override fun onViewDetachedFromWindow(v: View?) {
+        (sToolPresenter as IPresenter).bindView(null)
+    }
+
+    override fun onViewAttachedToWindow(v: View?) {
+        (sToolPresenter as IPresenter).bindView(this)
     }
 
     override fun onActionItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         when (item.itemId) {
             R.id.action_change_style -> {
-                EventBus.getInstance().post(ChangeLayoutEvent(ChangeLayoutEvent.ASK, null))
+                sToolPresenter?.onChangeLayout()
                 return true
             }
             R.id.action_path_pre -> {
-                EventBus.getInstance().post(OpenEvent("..", "..", false))
+                sToolPresenter?.onBack()
                 return true
             }
         }
@@ -103,18 +113,14 @@ class ToolbarImpl(inflater: MenuInflater, menu: Menu) : IToolView, View.OnClickL
         return false;
     }
 
-    @Subscribe
-    fun onChangeLayoutEvent(event: ChangeLayoutEvent) {
-        if (event.type == ChangeLayoutEvent.ACK) {
-            val layout = event.layout!!
-            if (layout == IListView.LAYOUT_STYLE_LIST) {
-                changeAction.setIcon(R.drawable.ic_tool_style_list)
-                changeAction.setTitle(R.string.tool_title_list)
-            } else if (layout == IListView.LAYOUT_STYLE_GRID) {
-                changeAction.setIcon(R.drawable.ic_tool_style_grid)
-                changeAction.setTitle(R.string.tool_title_grid)
-            }
-        }
+    override fun showListIcon() {
+        changeAction.setIcon(R.drawable.ic_tool_style_list)
+        changeAction.setTitle(R.string.tool_title_list)
+    }
+
+    override fun showGridIcon() {
+        changeAction.setIcon(R.drawable.ic_tool_style_grid)
+        changeAction.setTitle(R.string.tool_title_grid)
     }
 
 }

@@ -8,5 +8,5 @@ import android.support.annotation.Nullable;
  */
 
 public interface IPathView {
-    void showPath(@NonNull String path, @Nullable String alias);
+    void showPath(@NonNull CharSequence path);
 }

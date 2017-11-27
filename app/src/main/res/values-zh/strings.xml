@@ -29,6 +29,7 @@
     <string name="overview_file_type">文件类型：%s</string>
     <string name="overview_file_date">修改时间：%s</string>
     <string name="overview_folder">文件夹</string>
+    <string name="overview_selected_counts">已选择%s个文件</string>
 
     <string name="opt_name_copy">复制</string>
     <string name="opt_name_cut">剪切</string>
@@ -41,4 +42,6 @@
     <string name="opt_msg_delete">确认删除选中的文件吗?</string>
     <string name="opt_msg_rename">请输入新的文件名</string>
     <string name="opt_msg_paste">确认粘贴到此处吗?</string>
+
+    <string name="empty">无内容</string>
 </resources>

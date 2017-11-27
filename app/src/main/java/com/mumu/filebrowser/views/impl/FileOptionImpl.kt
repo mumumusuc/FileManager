@@ -100,7 +100,7 @@ class FileOptionImpl constructor(view: View) : IOptionView, View.OnClickListener
     fun onSelectedEvent(event: SelectedEvent) {
         val files = event.files
         var size = files?.size ?: 0
-        if (size == 1 && !(files[0] as FileWrapper).isSelected) {
+        if (size == 1 && !(files?.get(0) as FileWrapper).isSelected) {
             size = 0
         }
         showOptionDepandsOnSelected(size)

@@ -9,9 +9,9 @@ import presenter.IPresenter
  * Created by leonardo on 17-11-24.
  */
 class MainPresenterImpl() : IMainPresenter, IPresenter {
-    var mMainView:IMainView? = null
+    var mMainView: IMainView? = null
 
     override fun <IMainView> bindView(view: IMainView?) {
-        mMainView = view as com.mumu.filebrowser.views.IMainView
+        mMainView = if (view == null) null else view as com.mumu.filebrowser.views.IMainView
     }
 }

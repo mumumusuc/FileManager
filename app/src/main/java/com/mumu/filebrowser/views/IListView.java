@@ -26,6 +26,10 @@ public interface IListView<T> {
     /*list*/
     void notifyDataSetChanged();
 
+    void setEmptyView(@NonNull View v);
+
+    void setEmptyView(int layout);
+
     /*select*/
     void select(T... item);
 
