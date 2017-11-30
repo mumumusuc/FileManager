@@ -1,14 +1,9 @@
 package presenter;
 
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.mumu.filebrowser.model.IModel;
-import com.mumu.filebrowser.views.IListView;
+import com.mumu.filebrowser.model.ILayoutModel;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 /**
@@ -16,14 +11,6 @@ import java.util.List;
  */
 
 public interface IListPresenter<T> {
-    int MODE_NORMAL_VIEW = 10;
-    int MODE_MULTI_SELECT = 11;
-
-    @IntDef({MODE_NORMAL_VIEW, MODE_MULTI_SELECT})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface ViewMode {
-    }
-
     @NonNull
     List<T> getList();
 
@@ -31,10 +18,6 @@ public interface IListPresenter<T> {
 
     void onItemLongClick(@NonNull T item);
 
-    @IModel.LayoutStyle
+    @ILayoutModel.LayoutStyle
     int getCurrentLayoutStyle();
-
-    @ViewMode
-    int getCurrentViewMode();
-
 }

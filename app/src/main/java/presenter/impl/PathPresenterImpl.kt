@@ -9,17 +9,14 @@ import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import com.google.common.base.Splitter
 import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
-import com.mumu.filebrowser.eventbus.events.OpenEvent
 import com.mumu.filebrowser.eventbus.events.PathChangeEvent
-import com.mumu.filebrowser.model.IModel
-import com.mumu.filebrowser.model.impl.ModelImpl
+import com.mumu.filebrowser.model.IPathModel
+import com.mumu.filebrowser.model.impl.PathModel
 import com.mumu.filebrowser.utils.FileUtils
 import com.mumu.filebrowser.views.IPathView
 import presenter.IPathPresenter
@@ -35,7 +32,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
     private val mPath: MutableList<String> = arrayListOf()
     private val mSSB: SpannableStringBuilder = SpannableStringBuilder();
     private var mPathView: IPathView? = null
-    private val mModel: IModel = ModelImpl
+    private val mModel: IPathModel = PathModel
 
     init {
         EventBus.getInstance().register(this)
@@ -62,8 +59,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
         mSSB.setSpan(
                 object : ClickableSpan() {
                     override fun onClick(widget: View) {
-                        mModel.setPath(alias, subs)
-                        EventBus.getInstance().post(PathChangeEvent())
+                        mModel.setPath(alias, subs,true)
                     }
 
                     override fun updateDrawState(ds: TextPaint) {
@@ -86,8 +82,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
                         override fun onClick(widget: View) {
                             val target = buildFullPath(sub)
                             //Toast.makeText(mContext, target, Toast.LENGTH_SHORT).show()
-                            mModel.setPath(alias, target!!)
-                            EventBus.getInstance().post(PathChangeEvent())
+                            mModel.setPath(alias, target!!,true)
                         }
 
                         override fun updateDrawState(ds: TextPaint) {

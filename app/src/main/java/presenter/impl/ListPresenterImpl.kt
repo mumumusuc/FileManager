@@ -12,41 +12,44 @@ import com.mumu.filebrowser.eventbus.events.PathChangeEvent
 import com.mumu.filebrowser.eventbus.events.SelectedEvent
 import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.file.IFile
-import com.mumu.filebrowser.model.IModel
-import com.mumu.filebrowser.model.IModel.LAYOUT_STYLE_GRID
-import com.mumu.filebrowser.model.IModel.LAYOUT_STYLE_LIST
-import com.mumu.filebrowser.model.impl.ModelImpl
+import com.mumu.filebrowser.model.IPathModel
+import com.mumu.filebrowser.model.impl.PathModel
 import com.mumu.filebrowser.views.IListView
 import presenter.IListPresenter
-import presenter.IListPresenter.*
 import presenter.IPresenter
 import android.content.Intent
 import android.net.Uri
 import android.support.v4.content.FileProvider
 import android.os.Build
 import android.view.View
+import com.mumu.filebrowser.model.ILayoutModel
+import com.mumu.filebrowser.model.impl.LayoutModel
 import com.mumu.filebrowser.utils.FileUtils
 
 
 /**
  * Created by leonardo on 17-11-24.
  */
-class ListPresenterImpl() : IListPresenter<IFile>, IPresenter {
-    private val mModel: IModel = ModelImpl
+class ListPresenterImpl : IListPresenter<IFile>, IPresenter {
+    private val TAG = ListPresenterImpl::class.java.simpleName
+    private val MODE_NORMAL_VIEW = 10L
+    private val MODE_MULTI_SELECT = 11L
+
+    private val mModel: IPathModel = PathModel
+    private val mLayoutModel: ILayoutModel = LayoutModel
+    private val mStateModel = SelectState
     private var mListView: IListView<IFile>? = null
     private var mContext: Context? = null
-    @IListPresenter.ViewMode
     private var mCurrentViewMode = MODE_NORMAL_VIEW
     private var mCurrentPath = ""
-    private val mSelectedState: MutableSet<IFile> = mutableSetOf<IFile>()
 
     init {
         EventBus.getInstance().register(this)
     }
 
     override fun getList(): List<IFile> {
-        if (mCurrentPath.equals(mModel.currentPath)) {
-            open(FileWrapper(mModel.currentPath))
+        if (mCurrentPath == mModel.currentPath) {
+            open(FileWrapper(mModel.currentPath), false)
             mCurrentPath = mModel.currentPath
         }
         return mModel.currentFiles
@@ -64,7 +67,7 @@ class ListPresenterImpl() : IListPresenter<IFile>, IPresenter {
 
     override fun onItemClick(item: IFile) {
         Log.d("onItemClick", "" + mCurrentViewMode + "," + item.name)
-        open(item)
+        open(item, true)
     }
 
     override fun onItemLongClick(item: IFile) {
@@ -72,19 +75,19 @@ class ListPresenterImpl() : IListPresenter<IFile>, IPresenter {
         onItemClick(item)
     }
 
-    override fun getCurrentLayoutStyle() = mModel.layoutStyle
+    override fun getCurrentLayoutStyle() = mLayoutModel.layoutStyle
 
-    override fun getCurrentViewMode() = mCurrentViewMode
-
-    private fun open(file: IFile) {
+    private fun open(file: IFile, set: Boolean) {
         when (mCurrentViewMode) {
             MODE_NORMAL_VIEW -> {
                 if (Config.doubleClickOpen()) {
                     mListView?.focus(file)
                 } else {
                     if (file.isFolder) {
-                        mModel.setPath(mModel.currentCategory, file.path)
-                        mSelectedState.clear()
+                        if (set) {
+                            mModel.setPath(mModel.currentCategory, file.path, true)
+                        }
+                        mStateModel.clean()
                     } else {
                         openFile(file)
                     }
@@ -97,34 +100,10 @@ class ListPresenterImpl() : IListPresenter<IFile>, IPresenter {
                 file.isSelected = selected
                 mListView?.select(file)
                 if (selected) {
-                    mSelectedState += file
-                } else if (mSelectedState.contains(file)) {
-                    mSelectedState -= file
-                }
-                if (mSelectedState.size == 0) {
-                    mCurrentViewMode = MODE_NORMAL_VIEW
-                    EventBus.getInstance().post(FocusedEvent(FileWrapper(mModel.currentPath)))
+                    mStateModel.addSelectedFile(file)
                 } else {
-                    EventBus.getInstance().post(SelectedEvent(mSelectedState.toTypedArray()))
+                    mStateModel.removeSelectedFile(file)
                 }
-            }
-        }
-    }
-
-    @Subscribe
-    fun onPathChangeEvent(event: PathChangeEvent) {
-        open(FileWrapper(mModel.currentPath))
-        mListView?.notifyDataSetChanged()
-    }
-
-    @Subscribe
-    fun onLayoutChangeEvent(event: LayoutChangeEvent) {
-        when (mModel.layoutStyle) {
-            LAYOUT_STYLE_LIST -> {
-                mListView?.showAsList(true)
-            }
-            LAYOUT_STYLE_GRID -> {
-                mListView?.showAsGrid(true)
             }
         }
     }
@@ -146,5 +125,61 @@ class ListPresenterImpl() : IListPresenter<IFile>, IPresenter {
         }
         intent.setDataAndType(uri, type)
         mContext?.startActivity(intent)
+    }
+
+    @Subscribe
+    fun onPathChangeEvent(event: PathChangeEvent) {
+        Log.d(TAG, "onPathChangeEvent -> ")
+        open(FileWrapper(mModel.currentPath), false)
+        mListView?.notifyDataSetChanged()
+    }
+
+    @Subscribe
+    fun onLayoutChangeEvent(event: LayoutChangeEvent) {
+        Log.d(TAG, "onLayoutChangeEvent -> ")
+        when (LayoutModel.layoutStyle) {
+            ILayoutModel.LAYOUT_STYLE_LIST -> {
+                mListView?.showAsList(true)
+            }
+            ILayoutModel.LAYOUT_STYLE_GRID -> {
+                mListView?.showAsGrid(true)
+            }
+        }
+    }
+
+    @Subscribe
+    fun onSelectedFileChange(event: SelectedEvent) {
+        val files = event.files
+        Log.d(TAG, "onSelectedFileChange -> ${files.size} changes")
+        if (files.isEmpty()) {
+            mCurrentViewMode = MODE_NORMAL_VIEW
+            EventBus.getInstance().post(FocusedEvent(FileWrapper(mModel.currentPath)))
+        }
+    }
+
+    object SelectState {
+
+        private val mSelectedState: MutableSet<IFile> = mutableSetOf<IFile>()
+
+        fun clean() {
+            mSelectedState.clear()
+            EventBus.getInstance().post(SelectedEvent(getSelectedFiles()))
+        }
+
+        fun addSelectedFile(file: IFile) {
+            mSelectedState += file
+            EventBus.getInstance().post(SelectedEvent(getSelectedFiles()))
+        }
+
+        fun removeSelectedFile(file: IFile) {
+            if (mSelectedState.contains(file)) {
+                mSelectedState -= file
+                EventBus.getInstance().post(SelectedEvent(getSelectedFiles()))
+            }
+        }
+
+        fun getSelectedFiles(): Array<IFile> {
+            return mSelectedState.toTypedArray()
+        }
     }
 }

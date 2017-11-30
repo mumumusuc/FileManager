@@ -6,8 +6,9 @@ import android.support.v4.util.Pair
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.mumu.filebrowser.model.IModel.LAYOUT_STYLE_LIST
-import com.mumu.filebrowser.model.impl.ModelImpl
+import com.mumu.filebrowser.model.ILayoutModel.LAYOUT_STYLE_LIST
+import com.mumu.filebrowser.model.impl.LayoutModel
+import com.mumu.filebrowser.model.impl.PathModel
 import com.mumu.filebrowser.utils.FileUtils
 import java.io.BufferedReader
 import java.io.File
@@ -94,11 +95,11 @@ class MyApplication : Application() {
             /**/
             val defaultCategory = getString(R.string.nav_alias_storage)
             val defaultPath = FileUtils.getNavigationPath(defaultCategory)
-            ModelImpl.init(this, defaultCategory, defaultPath!!)
+            PathModel.init(this, defaultCategory, defaultPath!!)
             /**/
             checkNavigationPath()
             /**/
-            ModelImpl.setLayoutStyle(LAYOUT_STYLE_LIST)
+            LayoutModel.setLayoutStyle(LAYOUT_STYLE_LIST)
             initialized = true
         }
     }

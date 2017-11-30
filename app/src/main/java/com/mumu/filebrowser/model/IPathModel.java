@@ -13,16 +13,10 @@ import java.util.List;
  * Created by leonardo on 17-11-25.
  */
 
-public interface IModel {
-    int LAYOUT_STYLE_LIST = 0;
-    int LAYOUT_STYLE_GRID = 1;
+public interface IPathModel {
 
-    @IntDef({LAYOUT_STYLE_LIST, LAYOUT_STYLE_GRID})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface LayoutStyle {
-    }
 
-    boolean setPath(@NonNull String category, @NonNull String path);
+    boolean setPath(@NonNull String category, @NonNull String path, Boolean post);
 
     @NonNull
     String getCurrentCategory();
@@ -33,8 +27,5 @@ public interface IModel {
     @NonNull
     List<IFile> getCurrentFiles();
 
-    boolean setLayoutStyle(@LayoutStyle int style);
 
-    @LayoutStyle
-    int getLayoutStyle();
 }

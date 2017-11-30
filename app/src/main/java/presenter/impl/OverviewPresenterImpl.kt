@@ -12,7 +12,6 @@ import presenter.IPresenter
  * Created by leonardo on 17-11-27.
  */
 class OverviewPresenterImpl : IOverviewPresenter, IPresenter {
-
     private var mOverview: IOverview? = null
 
     init {
@@ -34,7 +33,7 @@ class OverviewPresenterImpl : IOverviewPresenter, IPresenter {
     }
 
     @Subscribe
-    fun onSelectedEvent(event: SelectedEvent) {
+    fun onSelectedFileChange(event: SelectedEvent) {
         val files = event.files
         if (files == null || files.isEmpty()) {
             mOverview?.cleanDisplay()

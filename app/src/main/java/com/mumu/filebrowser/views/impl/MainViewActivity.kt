@@ -4,13 +4,8 @@ import android.Manifest
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.*
-import android.widget.TextView
 import com.mumu.filebrowser.R
-import com.mumu.filebrowser.file.IFile
 import com.mumu.filebrowser.views.*
 import presenter.IMainPresenter
 import presenter.IPresenter
@@ -26,7 +21,6 @@ class MainViewActivity : AppCompatActivity(), IMainView {
 
     var mOverView: IOverview? = null
     var mToolView: IToolView? = null
-    var mOptionView: IOptionView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,10 +32,12 @@ class MainViewActivity : AppCompatActivity(), IMainView {
         setSupportActionBar(findViewById(R.id.toolbar))
         val overviewPanel = findViewById<View>(R.id.overview_panel)
         mOverView = OverviewImpl(overviewPanel)
-        mOptionView = FileOptionImpl(overviewPanel)
         ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS),
                 111)
     }
 

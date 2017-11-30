@@ -20,13 +20,18 @@ class FileUtils {
         var MIME_MAP: Map<String, String>? = null
         var PATH_TABLE: Map<String, Pair<String, Int>>? = null
 
-        fun checkPath(path: String): Boolean = File(path).exists()
+        fun checkPath(path: String): Boolean {
+            val storage = getNavigationPath("storage")
+            Log.d("checkPath", "path = $path, storage = $storage")
+            return path.startsWith(storage!!)
+        }
+
         fun checkCategory(category: String) = PATH_TABLE!!.containsKey(category)
 
         fun checkFileName(name: String?): Boolean {
-            Log.d(TAG, "checkFileName -> name=null?" + name)
+            Log.d(TAG, "checkFileName -> " + name)
             if (name == null || name.isEmpty() || name.length > 255) {
-                Log.d(TAG, "checkFileName ,,, -> " + name)
+                Log.d(TAG, "checkFileName -> bad")
                 return false;
             } else
                 return name.matches(Regex("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$"));

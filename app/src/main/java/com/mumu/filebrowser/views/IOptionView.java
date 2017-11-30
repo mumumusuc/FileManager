@@ -1,9 +1,6 @@
 package com.mumu.filebrowser.views;
 
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-
-import com.mumu.filebrowser.file.IFile;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,23 +10,23 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 public interface IOptionView {
-    void copy(@NonNull String from, @NonNull String to);
 
-    void move(@NonNull String from, @NonNull String to);
+    int NULL = 0;
+    int CREATE = 1;
+    int COPY = 2;
+    int CUT = 3;
+    int RENAME = 4;
+    int DELETE = 5;
+    int PASTE = 6;
 
-    void rename(@NonNull String from, @NonNull String to);
-
-    void delete(@NonNull IFile file);
-
-    void delete(@NonNull String src);
-
-    void create(@NonNull String name, @NonNull @CreateType int type);
-
-    int CREATE_TYPE_FILE = 0;
-    int CREATE_TYPE_FOLDER = 1;
-
-    @IntDef({CREATE_TYPE_FILE, CREATE_TYPE_FOLDER})
+    @IntDef({NULL, CREATE, COPY, CUT, RENAME, DELETE, PASTE})
     @Retention(RetentionPolicy.SOURCE)
-    @interface CreateType {
+    @interface Option {
     }
+
+    void showDialog(String title, String msg, String hint, boolean useRadio);
+
+    void dismissDialog();
+
+    void enableOption(@Option int option, boolean enable);
 }

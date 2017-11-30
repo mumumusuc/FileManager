@@ -1,12 +1,9 @@
 package presenter.impl
 
-import com.mumu.filebrowser.eventbus.EventBus
-import com.mumu.filebrowser.eventbus.events.LayoutChangeEvent
-import com.mumu.filebrowser.file.FileWrapper
-import com.mumu.filebrowser.model.IModel
-import com.mumu.filebrowser.model.IModel.LAYOUT_STYLE_GRID
-import com.mumu.filebrowser.model.IModel.LAYOUT_STYLE_LIST
-import com.mumu.filebrowser.model.impl.ModelImpl
+import com.mumu.filebrowser.model.ILayoutModel
+import com.mumu.filebrowser.model.ILayoutModel.LAYOUT_STYLE_GRID
+import com.mumu.filebrowser.model.ILayoutModel.LAYOUT_STYLE_LIST
+import com.mumu.filebrowser.model.impl.LayoutModel
 import com.mumu.filebrowser.views.IToolView
 import presenter.IPresenter
 import presenter.IToolPresenter
@@ -16,11 +13,11 @@ import presenter.IToolPresenter
  */
 class ToolPresenterImpl : IToolPresenter, IPresenter {
     private var mToolView: IToolView? = null
-    private val mModel: IModel = ModelImpl
+    private val mLayoutModel: ILayoutModel = LayoutModel
 
     override fun <IToolView> bindView(view: IToolView?) {
         mToolView = if (view == null) null else view as com.mumu.filebrowser.views.IToolView
-        when (mModel.layoutStyle) {
+        when (mLayoutModel.layoutStyle) {
             LAYOUT_STYLE_LIST -> {
                 mToolView?.showGridIcon()
             }
@@ -32,7 +29,7 @@ class ToolPresenterImpl : IToolPresenter, IPresenter {
 
     override fun onChangeLayout() {
         var style: Int
-        when (mModel.layoutStyle) {
+        when (mLayoutModel.layoutStyle) {
             LAYOUT_STYLE_LIST -> {
                 mToolView?.showListIcon()
                 style = LAYOUT_STYLE_GRID
@@ -42,7 +39,7 @@ class ToolPresenterImpl : IToolPresenter, IPresenter {
                 style = LAYOUT_STYLE_LIST
             }
         }
-        mModel.layoutStyle = style
+        mLayoutModel.layoutStyle = style
     }
 
     override fun onSearch() {
@@ -54,6 +51,6 @@ class ToolPresenterImpl : IToolPresenter, IPresenter {
     }
 
     override fun onBack() {
-        mModel.setPath(mModel.currentCategory,FileWrapper(mModel.currentPath).parent!!)
+        //mModel.setPath(mModel.currentCategory,FileWrapper(mModel.currentPath).parent!!,true)
     }
 }
