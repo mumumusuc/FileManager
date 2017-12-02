@@ -3,7 +3,9 @@ package presenter.impl
 import com.mumu.filebrowser.model.ILayoutModel
 import com.mumu.filebrowser.model.ILayoutModel.LAYOUT_STYLE_GRID
 import com.mumu.filebrowser.model.ILayoutModel.LAYOUT_STYLE_LIST
+import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.impl.LayoutModel
+import com.mumu.filebrowser.model.impl.PathModel
 import com.mumu.filebrowser.views.IToolView
 import presenter.IPresenter
 import presenter.IToolPresenter
@@ -14,6 +16,7 @@ import presenter.IToolPresenter
 class ToolPresenterImpl : IToolPresenter, IPresenter {
     private var mToolView: IToolView? = null
     private val mLayoutModel: ILayoutModel = LayoutModel
+    private val mPathModel: IPathModel = PathModel
 
     override fun <IToolView> bindView(view: IToolView?) {
         mToolView = if (view == null) null else view as com.mumu.filebrowser.views.IToolView
@@ -51,6 +54,6 @@ class ToolPresenterImpl : IToolPresenter, IPresenter {
     }
 
     override fun onBack() {
-        //mModel.setPath(mModel.currentCategory,FileWrapper(mModel.currentPath).parent!!,true)
+        mPathModel.enterPrevious()
     }
 }

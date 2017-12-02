@@ -32,14 +32,13 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
     private val mPath: MutableList<String> = arrayListOf()
     private val mSSB: SpannableStringBuilder = SpannableStringBuilder();
     private var mPathView: IPathView? = null
-    private val mModel: IPathModel = PathModel
+    private val mPathModel: IPathModel = PathModel
 
     init {
         EventBus.getInstance().register(this)
     }
 
     override fun onPathClick(path: String) {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun <IPathView> bindView(view: IPathView?) {
@@ -49,17 +48,16 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
     private fun addClickablePart(str: String): SpannableStringBuilder? {
         mSSB.clear()
         mSSB.clearSpans()
-        val alias = mModel.currentCategory
-        val subs = FileUtils.getNavigationPath(alias)
+        val subs = FileUtils.getCategoryPath(mPathModel.category)
         val str = str.substring(subs!!.length, str.length)
         mPath.clear()
         mPath.addAll(Splitter.on(File.separatorChar).omitEmptyStrings().splitToList(str))
-        val aliasName = mContext.resources.getString(FileUtils.getNavigationName(alias)!!)
+        val aliasName = FileUtils.getCategoryName(mContext.resources, mPathModel.category)
         mSSB.append(aliasName)
         mSSB.setSpan(
                 object : ClickableSpan() {
                     override fun onClick(widget: View) {
-                        mModel.setPath(alias, subs,true)
+                        mPathModel.enter(mPathModel.category)
                     }
 
                     override fun updateDrawState(ds: TextPaint) {
@@ -81,8 +79,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
                     object : ClickableSpan() {
                         override fun onClick(widget: View) {
                             val target = buildFullPath(sub)
-                            //Toast.makeText(mContext, target, Toast.LENGTH_SHORT).show()
-                            mModel.setPath(alias, target!!,true)
+                            mPathModel.enter(target!!)
                         }
 
                         override fun updateDrawState(ds: TextPaint) {
@@ -102,7 +99,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
             return null
         }
         mSSB.clear()
-        mSSB.append(FileUtils.getNavigationPath(mModel.currentCategory))
+        mSSB.append(FileUtils.getCategoryPath(mPathModel.category))
         for (str in pathlist) {
             mSSB.append(File.separatorChar).append(str)
         }
@@ -131,6 +128,6 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
 
     @Subscribe
     fun onPathChangeEvent(event: PathChangeEvent) {
-        mPathView?.showPath(addClickablePart(mModel.currentPath) as CharSequence)
+        mPathView?.showPath(addClickablePart(mPathModel.path) as CharSequence)
     }
 }

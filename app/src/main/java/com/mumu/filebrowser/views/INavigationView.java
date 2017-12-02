@@ -1,5 +1,7 @@
 package com.mumu.filebrowser.views;
 
+import com.mumu.filebrowser.model.IPathModel;
+
 import presenter.INavigationPresenter;
 
 /**
@@ -7,5 +9,5 @@ import presenter.INavigationPresenter;
  */
 
 public interface INavigationView {
-    void select(String navi);
+    void select(@IPathModel.Category int category);
 }

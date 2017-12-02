@@ -6,6 +6,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.common.io.Files;
 import com.mumu.filebrowser.R;
 
 import java.io.File;
@@ -28,36 +29,25 @@ public class FileWrapper implements IFile {
 
     private File mFile;
     private String mSuffix;
-    @Category.CATEGORY
-    private int mCategory = Category.UNKNOWN;
-    @State.STATE
-    private int mState = State.NONE;
+    @Type
+    private int mCategory = UNKNOWN;
     private int mIconResource;
 
-    static final class Category {
-        public final static int MUSIC = 0;
-        public final static int VIDEO = 1;
-        public final static int PICTURE = 2;
-        public final static int DOCUMENT = 3;
-        public final static int ZIP = 4;
-        public final static int APK = 5;
-        public final static int UNKNOWN = 999;
+    public final static int MUSIC = 0;
+    public final static int VIDEO = 1;
+    public final static int PICTURE = 2;
+    public final static int DOCUMENT = 3;
+    public final static int ZIP = 4;
+    public final static int APK = 5;
+    public final static int UNKNOWN = 999;
 
-        @Retention(RetentionPolicy.SOURCE)
-        @IntDef({MUSIC, VIDEO, PICTURE, DOCUMENT, ZIP, APK, UNKNOWN})
-        public @interface CATEGORY {
-        }
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({MUSIC, VIDEO, PICTURE, DOCUMENT, ZIP, APK, UNKNOWN})
+    public @interface Type {
     }
 
-    static final class State {
-        public final static int NONE = 0;
-        public final static int FOCUSED = 0x10;
-        public final static int SELECTED = 0x11;
-
-        @Retention(RetentionPolicy.SOURCE)
-        @IntDef({NONE, FOCUSED, SELECTED})
-        public @interface STATE {
-        }
+    public static IFile gets(@NonNull String path) {
+        return new FileWrapper(path);
     }
 
     public FileWrapper(@NonNull File file) {
@@ -87,12 +77,6 @@ public class FileWrapper implements IFile {
         return mFile.getAbsolutePath();
     }
 
-    @Nullable
-    @Override
-    public String getParent() {
-        return mFile.getParent();
-    }
-
     @NonNull
     @Override
     public Drawable getIcon(@Nullable Resources res) {
@@ -105,17 +89,17 @@ public class FileWrapper implements IFile {
     public int getIconResource() {
         if (mIconResource <= 0) {
             switch (getCategory()) {
-                case Category.MUSIC:
+                case MUSIC:
                     break;
-                case Category.VIDEO:
+                case VIDEO:
                     break;
-                case Category.PICTURE:
+                case PICTURE:
                     break;
-                case Category.DOCUMENT:
+                case DOCUMENT:
                     break;
-                case Category.ZIP:
+                case ZIP:
                     break;
-                case Category.APK:
+                case APK:
                     break;
                 default:
                     mIconResource = isFolder() ? R.drawable.ic_item_floder : R.drawable.ic_item_file;
@@ -125,19 +109,15 @@ public class FileWrapper implements IFile {
         return mIconResource;
     }
 
-    @Override
-    public int getProperty() {
-        return 0;
-    }
-
     @Nullable
     @Override
     public String getSuffix() {
         if (mSuffix == null) {
-            String name = getName();
+            /*String name = getName();
             int start = name.lastIndexOf(".");
             if (start >= name.length() - 1) return null;
-            return mSuffix = name.substring(start + 1, name.length()).toLowerCase();
+            return mSuffix = name.substring(start + 1, name.length()).toLowerCase();*/
+            return mSuffix = Files.getFileExtension(getPath());
         } else {
             return mSuffix;
         }
@@ -160,30 +140,9 @@ public class FileWrapper implements IFile {
         return new SimpleDateFormat(useformat).format(mFile.lastModified());
     }
 
-    @State.STATE
-    public int getState() {
-        return mState;
-    }
-
-    @Category.CATEGORY
+    @Type
     public int getCategory() {
         return mCategory;
-    }
-
-    public void setSelected(boolean selected) {
-        mState = selected ? State.SELECTED : mState == State.SELECTED ? State.NONE : mState;
-    }
-
-    public boolean isSelected() {
-        return mState == State.SELECTED;
-    }
-
-    public void setFocused(boolean focused) {
-        mState = focused ? State.FOCUSED : mState == State.FOCUSED ? State.NONE : mState;
-    }
-
-    public boolean isFocused() {
-        return mState == State.FOCUSED;
     }
 
     @Override

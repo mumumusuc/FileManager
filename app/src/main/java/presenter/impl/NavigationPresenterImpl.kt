@@ -12,14 +12,14 @@ import presenter.IPresenter
  */
 class NavigationPresenterImpl : INavigationPresenter, IPresenter {
     private var mNavigationView: INavigationView? = null
-    private val mModel: IPathModel = PathModel
+    private val mPathModel: IPathModel = PathModel
 
     override fun <INavigationView> bindView(view: INavigationView?) {
         mNavigationView = if (view == null) null else view as com.mumu.filebrowser.views.INavigationView
     }
 
-    override fun onNavigation(navigation: String): Boolean {
-        mModel.setPath(navigation, FileUtils.getNavigationPath(navigation)!!,true)
+    override fun onNavigation(navigation: Int): Boolean {
+        mPathModel.enter(navigation)
         return true
     }
 

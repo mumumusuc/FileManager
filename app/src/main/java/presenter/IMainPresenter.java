@@ -11,4 +11,5 @@ import com.mumu.filebrowser.views.IToolView;
  */
 
 public interface IMainPresenter  {
+
 }

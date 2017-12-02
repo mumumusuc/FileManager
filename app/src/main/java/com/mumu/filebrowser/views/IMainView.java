@@ -1,5 +1,8 @@
 package com.mumu.filebrowser.views;
 
+import android.annotation.NonNull;
+import android.content.Context;
+
 import presenter.IMainPresenter;
 
 /**
@@ -7,5 +10,6 @@ import presenter.IMainPresenter;
  */
 
 public interface IMainView {
-
+    @NonNull
+    Context getContext();
 }

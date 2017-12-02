@@ -3,6 +3,8 @@ package presenter;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import com.mumu.filebrowser.model.IPathModel;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -11,5 +13,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 public interface INavigationPresenter {
-    boolean onNavigation(@NonNull String navigation);
+    boolean onNavigation(@IPathModel.Category int category);
 }

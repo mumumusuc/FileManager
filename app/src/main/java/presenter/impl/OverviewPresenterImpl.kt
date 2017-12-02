@@ -1,9 +1,12 @@
 package presenter.impl
 
+import android.util.Log
 import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.FocusedEvent
 import com.mumu.filebrowser.eventbus.events.SelectedEvent
+import com.mumu.filebrowser.file.FileWrapper
+import com.mumu.filebrowser.file.IFile
 import com.mumu.filebrowser.views.IOverview
 import presenter.IOverviewPresenter
 import presenter.IPresenter
@@ -28,7 +31,7 @@ class OverviewPresenterImpl : IOverviewPresenter, IPresenter {
         if (file == null) {
             mOverview?.cleanDisplay()
         } else {
-            mOverview?.showFocusedview(file)
+            mOverview?.showFocusedview(FileWrapper.gets(file))
         }
     }
 
@@ -38,7 +41,14 @@ class OverviewPresenterImpl : IOverviewPresenter, IPresenter {
         if (files == null || files.isEmpty()) {
             mOverview?.cleanDisplay()
         } else {
-            mOverview?.showSelectedView(files)
+            val target = arrayOfNulls<IFile>(files.size)
+            files.forEachIndexed { index, value ->
+                run {
+                    Log.d("Overview", "onSelectedFileChange -> name = $value")
+                    target[index] = FileWrapper(value)
+                }
+            }
+            mOverview?.showSelectedView(target)
         }
     }
 }

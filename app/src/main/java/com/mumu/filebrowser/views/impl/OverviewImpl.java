@@ -1,19 +1,16 @@
 package com.mumu.filebrowser.views.impl;
 
+import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.graphics.drawable.DrawableWrapper;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.common.eventbus.Subscribe;
 import com.mumu.filebrowser.R;
-import com.mumu.filebrowser.eventbus.EventBus;
-import com.mumu.filebrowser.eventbus.events.SelectedEvent;
 import com.mumu.filebrowser.file.IFile;
 import com.mumu.filebrowser.views.IOverview;
 
@@ -26,11 +23,7 @@ import presenter.impl.OverviewPresenterImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Created by leonardo on 17-11-14.
- */
-
-public class OverviewImpl implements IOverview, View.OnAttachStateChangeListener {
+public class OverviewImpl extends LinearLayout implements IOverview {
     private static final String TAG = OverviewImpl.class.getName();
     private static final IOverviewPresenter sOverviewPresenter = new OverviewPresenterImpl();
 
@@ -65,13 +58,23 @@ public class OverviewImpl implements IOverview, View.OnAttachStateChangeListener
     @BindString(R.string.overview_selected_counts)
     String FILES_SELECTED;
 
-    private Resources mResources;
+    public OverviewImpl(Context context) {
+        super(context);
+        init();
+    }
 
-    public OverviewImpl(@NonNull View view) {
-        checkNotNull(view);
-        mResources = view.getResources();
-        view.addOnAttachStateChangeListener(this);
-        ButterKnife.bind(this, view);
+    public OverviewImpl(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public OverviewImpl(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    public void init() {
+
     }
 
     private void showSelectedContent(boolean show) {
@@ -89,41 +92,64 @@ public class OverviewImpl implements IOverview, View.OnAttachStateChangeListener
     }
 
     @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        ButterKnife.bind(this, this);
+    }
+
+    @Override
     public void cleanDisplay() {
-        showFocusedContent(false);
-        showSelectedContent(false);
+        getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                showFocusedContent(false);
+                showSelectedContent(false);
+            }
+        });
     }
 
     @Override
     public void showFocusedview(@NonNull IFile file) {
-        showFocusedContent(true);
-        showSelectedContent(false);
-        boolean isFolder = file.isFolder();
-        mIcon.setImageDrawable(file.getIcon(mResources).mutate());
-        String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, file.getName());
-        mName.setText(name);
-        String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE + "byte", file.getSize());
-        mSize.setText(size);
-        String suffix = String.format(FILE_TYPE, isFolder ? FOLDER : file.getSuffix());
-        mType.setText(suffix);
-        String date = String.format(FILE_DATE, file.getLastDate(null));
-        mDate.setText(date);
+        getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                showFocusedContent(true);
+                showSelectedContent(false);
+                boolean isFolder = file.isFolder();
+                mIcon.setImageDrawable(file.getIcon(getResources()).mutate());
+                String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, file.getName());
+                mName.setText(name);
+                String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE + "byte", file.getSize());
+                mSize.setText(size);
+                String suffix = String.format(FILE_TYPE, isFolder ? FOLDER : file.getSuffix());
+                mType.setText(suffix);
+                String date = String.format(FILE_DATE, file.getLastDate(null));
+                mDate.setText(date);
+            }
+        });
     }
 
     @Override
     public void showSelectedView(@NonNull IFile... files) {
-        showFocusedContent(false);
-        showSelectedContent(true);
-        mCounts.setText(String.format(FILES_SELECTED, files.length));
+        getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                showFocusedContent(false);
+                showSelectedContent(true);
+                mCounts.setText(String.format(FILES_SELECTED, files.length));
+            }
+        });
     }
 
     @Override
-    public void onViewAttachedToWindow(View v) {
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
         ((IPresenter) sOverviewPresenter).bindView(this);
     }
 
     @Override
-    public void onViewDetachedFromWindow(View v) {
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         ((IPresenter) sOverviewPresenter).bindView(null);
     }
 }

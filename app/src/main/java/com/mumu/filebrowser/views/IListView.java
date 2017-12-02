@@ -26,13 +26,17 @@ public interface IListView<T> {
     /*list*/
     void notifyDataSetChanged();
 
+    void notifyItemInserted(int index);
+
+    void notifyItemRemoved(int index);
+
     void setEmptyView(@NonNull View v);
 
     void setEmptyView(int layout);
 
     /*select*/
-    void select(T... item);
+    void select(T item, boolean select);
 
     /*focus*/
-    void focus(T item);
+    void focus(T item, boolean focus);
 }

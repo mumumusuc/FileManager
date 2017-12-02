@@ -17,9 +17,6 @@ public interface IFile {
     @NonNull
     String getPath();
 
-    @Nullable
-    String getParent();
-
     @NonNull
     Drawable getIcon(@NonNull Resources res);
 
@@ -28,8 +25,6 @@ public interface IFile {
 
     @Nullable
     String getSuffix();
-
-    int getProperty();
 
     /**
      * @return if this file is a folder

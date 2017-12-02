@@ -9,6 +9,7 @@ import android.view.MenuItem
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.mumu.filebrowser.R
+import com.mumu.filebrowser.model.IPathModel.*
 import com.mumu.filebrowser.views.INavigationView
 import presenter.INavigationPresenter
 import presenter.IPresenter
@@ -22,7 +23,17 @@ class NavigationViewImpl : NavigationView, INavigationView, NavigationView.OnNav
         private val sNavigationPresenter: INavigationPresenter = NavigationPresenterImpl()
     }
 
-    private val mAlisaMap: BiMap<Int, String> = HashBiMap.create()
+    private val mMap: BiMap<Int, Int> = HashBiMap.create()
+
+    init {
+        mMap.put(R.id.nav_camera, CAMERA)
+        mMap.put(R.id.nav_music, MUSIC)
+        mMap.put(R.id.nav_picture, PICTURE)
+        mMap.put(R.id.nav_video, VIDEO)
+        mMap.put(R.id.nav_document, DOCUMENT)
+        mMap.put(R.id.nav_download, DOWNLOAD)
+        mMap.put(R.id.nav_storage, STORAGE)
+    }
 
     constructor(context: Context?) : super(context) {
         init()
@@ -37,15 +48,7 @@ class NavigationViewImpl : NavigationView, INavigationView, NavigationView.OnNav
     }
 
     private fun init() {
-        mAlisaMap.put(R.id.nav_camera, resources.getString(R.string.nav_alias_camera))
-        mAlisaMap.put(R.id.nav_music, resources.getString(R.string.nav_alias_music))
-        mAlisaMap.put(R.id.nav_picture, resources.getString(R.string.nav_alias_picture))
-        mAlisaMap.put(R.id.nav_video, resources.getString(R.string.nav_alias_video))
-        mAlisaMap.put(R.id.nav_document, resources.getString(R.string.nav_alias_document))
-        mAlisaMap.put(R.id.nav_download, resources.getString(R.string.nav_alias_download))
-        mAlisaMap.put(R.id.nav_storage, resources.getString(R.string.nav_alias_storage))
         setNavigationItemSelectedListener(this);
-        mAlisaMap.map { Log.d("mAlisaMap", "< " + it.key + " , " + it.value + " >") }
     }
 
     @SuppressLint("RestrictedApi")
@@ -63,13 +66,13 @@ class NavigationViewImpl : NavigationView, INavigationView, NavigationView.OnNav
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         item.isCheckable = true
         //menu.
-        var alias: String? = mAlisaMap.get(item.itemId)
-        return sNavigationPresenter?.onNavigation(alias!!) ?: false
+        val category = mMap.get(item.itemId)
+        return sNavigationPresenter.onNavigation(category!!)
     }
 
-    override fun select(navi: String) {
-        menu.findItem(mAlisaMap.inverse().get(navi) ?: -1).isChecked = true
-        onNavigationItemSelected(menu.findItem(mAlisaMap.inverse().get(navi) ?: -1))
+    override fun select(category: Int) {
+        menu.findItem(mMap.inverse().get(category) ?: -1).isChecked = true
+        onNavigationItemSelected(menu.findItem(mMap.inverse().get(category) ?: -1))
     }
 
 }

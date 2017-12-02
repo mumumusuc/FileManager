@@ -71,32 +71,34 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
     }
 
     override fun enableOption(option: Int, enable: Boolean) {
-        when (option) {
-            NULL -> {
-                mCreate?.isEnabled = enable
-                mCopy?.isEnabled = enable
-                mCut?.isEnabled = enable
-                mRename?.isEnabled = enable
-                mDelete?.isEnabled = enable
-                mPaste?.isEnabled = enable
-            }
-            CREATE -> {
-                mCreate?.isEnabled = enable
-            }
-            COPY -> {
-                mCopy?.isEnabled = enable
-            }
-            CUT -> {
-                mCut?.isEnabled = enable
-            }
-            RENAME -> {
-                mRename?.isEnabled = enable
-            }
-            DELETE -> {
-                mDelete?.isEnabled = enable
-            }
-            PASTE -> {
-                mPaste?.isEnabled = enable
+        handler.post {
+            when (option) {
+                NULL -> {
+                    mCreate?.isEnabled = enable
+                    mCopy?.isEnabled = enable
+                    mCut?.isEnabled = enable
+                    mRename?.isEnabled = enable
+                    mDelete?.isEnabled = enable
+                    mPaste?.isEnabled = enable
+                }
+                CREATE -> {
+                    mCreate?.isEnabled = enable
+                }
+                COPY -> {
+                    mCopy?.isEnabled = enable
+                }
+                CUT -> {
+                    mCut?.isEnabled = enable
+                }
+                RENAME -> {
+                    mRename?.isEnabled = enable
+                }
+                DELETE -> {
+                    mDelete?.isEnabled = enable
+                }
+                PASTE -> {
+                    mPaste?.isEnabled = enable
+                }
             }
         }
     }

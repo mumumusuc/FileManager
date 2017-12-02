@@ -1,6 +1,7 @@
 package com.mumu.filebrowser.views.impl
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
@@ -16,22 +17,18 @@ import presenter.impl.MainPresenterImpl
  */
 class MainViewActivity : AppCompatActivity(), IMainView {
     companion object {
-        var sMainPresenter: IMainPresenter? = null
+        val sMainPresenter: IMainPresenter = MainPresenterImpl()
     }
 
-    var mOverView: IOverview? = null
     var mToolView: IToolView? = null
+
+    override fun getContext(): Context = baseContext
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (sMainPresenter == null) {
-            sMainPresenter = MainPresenterImpl()
-        }
         (sMainPresenter as IPresenter).bindView(this)
         setSupportActionBar(findViewById(R.id.toolbar))
-        val overviewPanel = findViewById<View>(R.id.overview_panel)
-        mOverView = OverviewImpl(overviewPanel)
         ActivityCompat.requestPermissions(
                 this,
                 arrayOf(

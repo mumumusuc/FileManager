@@ -12,9 +12,9 @@ import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.impl.PathModel
 import com.mumu.filebrowser.utils.FileUtils
 import com.mumu.filebrowser.utils.OptionUtils
-import com.mumu.filebrowser.utils.OptionUtils.Companion.CREATE_TYPE_FILE
-import com.mumu.filebrowser.utils.OptionUtils.Companion.CREATE_TYPE_FOLDER
-import com.mumu.filebrowser.utils.OptionUtils.Companion.NO_ERROR
+import com.mumu.filebrowser.utils.OptionUtils.CREATE_TYPE_FILE
+import com.mumu.filebrowser.utils.OptionUtils.CREATE_TYPE_FOLDER
+import com.mumu.filebrowser.utils.OptionUtils.NO_ERROR
 import com.mumu.filebrowser.views.IOptionView
 import com.mumu.filebrowser.views.IOptionView.*
 import presenter.IOptionPresenter
@@ -29,9 +29,9 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
 
     private var mOptionView: IOptionView? = null
     private var mResources: Resources? = null
-    private val mModel: IPathModel = PathModel
+    private val mPathModel: IPathModel = PathModel
     private var mState: Int = NULL
-    private val mSelectedFiles = mutableSetOf<IFile>()
+    private val mSelectedFiles = mutableSetOf<String>()
 
     init {
         EventBus.getInstance().register(this)
@@ -116,29 +116,22 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
                                 }
                             }
                     )
-                    when (state) {
-                        NO_ERROR -> {
-                            mModel.setPath(mModel.currentCategory, mModel.currentPath, true)
-                        }
-                        else -> {
-                            Log.w("OptionPresenterImpl", "state = $state")
-                        }
+                    Log.i("OptionPresenterImpl", "state = $state")
+                    if (state == NO_ERROR) {
+                        onCancel()
+                    } else {
+                        mOptionView?.showDialog("", "文件已存在", "", true)
                     }
-                    onCancel()
                 } else {
                     mOptionView?.showDialog("", "请检查文件名是否正确", "", true)
                 }
             }
             DELETE -> {
-                var state: Boolean
+                var state: Int
                 mSelectedFiles.map {
                     state = OptionUtils.delete(it)
                     Log.i("OptionPresenterImpl", "delete = $state")
-                    if (state) {
-                        mModel.setPath(mModel.currentCategory, mModel.currentPath, true)
-                    }
                 }
-                mModel.setPath(mModel.currentCategory, mModel.currentPath, true)
                 onCancel()
             }
             RENAME -> {
@@ -147,11 +140,7 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
                     val state = OptionUtils.rename(
                             mSelectedFiles.toTypedArray()[0],
                             buildFullPath(content!!))
-                    if (state == NO_ERROR) {
-                        mModel.setPath(mModel.currentCategory, mModel.currentPath, true)
-                    } else {
-                        Log.w("OptionPresenterImpl", "rename = $state")
-                    }
+                    Log.w("OptionPresenterImpl", "rename = $state")
                     onCancel()
                 } else {
                     mOptionView?.showDialog("", "请检查文件名是否正确", "", true)
@@ -161,7 +150,7 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
 
     }
 
-    private fun buildFullPath(name: String): String = mModel.currentPath + File.separatorChar + name
+    private fun buildFullPath(name: String): String = mPathModel.path + File.separatorChar + name
 
     @Subscribe
     fun onSelectedFileChange(event: SelectedEvent) {

@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
-import android.support.annotation.IntDef
 import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.RecyclerView
@@ -21,19 +20,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.file.FileWrapper
-import com.mumu.filebrowser.file.IFile
 import com.mumu.filebrowser.views.IListView
 import presenter.IListPresenter
 import presenter.IPresenter
 import presenter.impl.ListPresenterImpl
 
-/**
- * Created by leonardo on 17-11-24.
- */
-class ListViewImpl : FrameLayout, IListView<IFile>, View.OnClickListener, View.OnLongClickListener {
+class ListViewImpl : FrameLayout, IListView<String>, View.OnClickListener, View.OnLongClickListener {
     companion object {
-        private val sListPresenter: IListPresenter<IFile> = ListPresenterImpl()
-        private val EMPTY_TYPE = 99
+        private val sListPresenter: IListPresenter<String> = ListPresenterImpl()
     }
 
     private var mEmptyView: View? = null
@@ -66,11 +60,11 @@ class ListViewImpl : FrameLayout, IListView<IFile>, View.OnClickListener, View.O
     }
 
     override fun onClick(v: View?) {
-        sListPresenter?.onItemClick(v!!.tag as IFile)
+        sListPresenter?.onItemClick(v?.tag as String)
     }
 
     override fun onLongClick(v: View?): Boolean {
-        sListPresenter?.onItemLongClick(v!!.tag as IFile)
+        sListPresenter?.onItemLongClick(v?.tag as String)
         return true
     }
 
@@ -83,51 +77,54 @@ class ListViewImpl : FrameLayout, IListView<IFile>, View.OnClickListener, View.O
     }
 
     override fun notifyDataSetChanged() {
-        mRecyclerView?.adapter?.notifyDataSetChanged()
+        //keep in main-thread
+        handler.post { mRecyclerView?.adapter?.notifyDataSetChanged() }
+    }
+
+    override fun notifyItemInserted(index: Int) {
+        //keep in main-thread
+        handler.post { mRecyclerView?.adapter?.notifyItemInserted(index) }
+    }
+
+    override fun notifyItemRemoved(index: Int) {
+        //keep in main-thread
+        handler.post { mRecyclerView?.adapter?.notifyItemRemoved(index) }
     }
 
     override fun setEmptyView(v: View) {
-        if (mEmptyView != null) {
-            removeViewAt(0)
+        //keep in main-thread
+        handler.post {
+            if (mEmptyView != null) {
+                removeViewAt(0)
+            }
+            mEmptyView = v
+            addView(mEmptyView, 0)
         }
-        mEmptyView = v
-        addView(mEmptyView, 0)
     }
 
     override fun setEmptyView(layout: Int) {
         setEmptyView(View.inflate(context, layout, null))
     }
 
-    override fun select(vararg items: IFile?) {
-        if (items == null || items.isEmpty()) {
-            TODO("disselect all")
-        } else {
-            items.map {
-                val selected = (it as FileWrapper).isSelected
-                for (i in 0..(mRecyclerView!!.childCount - 1)) {
-                    val view = mRecyclerView!!.getChildAt(i)
-                    if (it == view.tag) {
-                        view.isSelected = selected
-                        val holder = mRecyclerView?.getChildViewHolder(view) as SimpleViewHolder
-                        holder.mDrawable?.setSelected(selected, true)
-                        break
-                    }
-                }
+    override fun select(items: String, selected: Boolean) {
+        for (i in 0..(mRecyclerView!!.childCount - 1)) {
+            val view = mRecyclerView!!.getChildAt(i)
+            if (items == view.tag) {
+                view.isSelected = selected
+                val holder = mRecyclerView?.getChildViewHolder(view) as SimpleViewHolder
+                holder.mDrawable?.setSelected(selected, true)
+                break
             }
         }
     }
 
-    override fun focus(item: IFile?) {
-        if (item == null) {
-            TODO("disselect all")
-        } else {
-            val focus = (item as FileWrapper).isFocused
-            for (i in 0..(mRecyclerView!!.childCount - 1)) {
-                val view = mRecyclerView!!.getChildAt(i)
-                if (focus) view.requestFocus() else view.clearFocus()
-                break
-            }
+    override fun focus(item: String, focus: Boolean) {
+        for (i in 0..(mRecyclerView!!.childCount - 1)) {
+            val view = mRecyclerView!!.getChildAt(i)
+            if (focus) view.requestFocus() else view.clearFocus()
+            break
         }
+
     }
 
     /*Adapter*/
@@ -146,24 +143,26 @@ class ListViewImpl : FrameLayout, IListView<IFile>, View.OnClickListener, View.O
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             if (holder is SimpleViewHolder) {
-                val file = sListPresenter!!.list.get(position)
-                holder.mItemName!!.setText(file!!.getName())
-                val icon = DrawableCompat.wrap(file!!.getIcon(resources))
+                val name = sListPresenter!!.list.get(position)
+                Log.i("onBindViewHolder", "onBindViewHolder -> bind $name")
+                val file = FileWrapper.gets(name)
+                holder.mItemName!!.setText(file.name)
+                val icon = DrawableCompat.wrap(file.getIcon(resources))
                 val selectedDrawable = resources.getDrawable(R.drawable.ic_item_selected, null)
                 val drawable = SelectDrawable(
                         arrayOf(icon.mutate(), selectedDrawable.mutate()))
                 holder.setDrawable(drawable)
-                val selected = (file as FileWrapper).isSelected
+                val selected = sListPresenter.isItemSelected(file.path)
                 drawable.setSelected(selected, false)
                 holder.mItem!!.isSelected = selected
-                holder.mItem!!.tag = file
+                holder.mItem!!.tag = name
             }
         }
 
         override fun getItemCount(): Int {
             val size = sListPresenter?.list.size
             mEmptyView?.visibility = if (size == 0) View.VISIBLE else View.GONE
-            return sListPresenter?.list.size
+            return size
         }
 
         override fun getItemViewType(position: Int): Int {
@@ -182,10 +181,7 @@ class ListViewImpl : FrameLayout, IListView<IFile>, View.OnClickListener, View.O
         }
     }
 
-    internal inner class EmptyViewHolder(emptyView: View?) : RecyclerView.ViewHolder(emptyView)
-
     internal inner class SelectDrawable constructor(layers: Array<Drawable>) : LayerDrawable(layers) {
-
         var animValue: Float = 0F
             set(value) {
                 var v = value

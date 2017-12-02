@@ -18,6 +18,10 @@ public interface IListPresenter<T> {
 
     void onItemLongClick(@NonNull T item);
 
+    boolean isItemFocused(@NonNull T item);
+
+    boolean isItemSelected(@NonNull T item);
+
     @ILayoutModel.LayoutStyle
     int getCurrentLayoutStyle();
 }

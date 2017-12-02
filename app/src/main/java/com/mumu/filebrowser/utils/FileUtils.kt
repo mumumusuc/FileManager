@@ -1,76 +1,95 @@
 package com.mumu.filebrowser.utils
 
-import android.support.v4.util.Pair
+import android.content.res.Resources
+import android.os.Environment
 import android.util.Log
-import com.google.common.base.Preconditions.checkArgument
-import com.google.common.collect.Lists
-import com.mumu.filebrowser.file.FileWrapper
-import com.mumu.filebrowser.file.IFile
-import java.io.File
+import com.mumu.filebrowser.R
+import com.mumu.filebrowser.model.IPathModel
+import com.mumu.filebrowser.model.IPathModel.*
 
 /**
  * Created by leonardo on 17-11-12.
  */
-class FileUtils {
+object FileUtils {
+    private val TAG = FileUtils::class.java.simpleName
 
+    var MIME_MAP: Map<String, String>? = null
 
-    companion object {
-        private val TAG = FileUtils::class.java.simpleName
-
-        var MIME_MAP: Map<String, String>? = null
-        var PATH_TABLE: Map<String, Pair<String, Int>>? = null
-
-        fun checkPath(path: String): Boolean {
-            val storage = getNavigationPath("storage")
-            Log.d("checkPath", "path = $path, storage = $storage")
-            return path.startsWith(storage!!)
-        }
-
-        fun checkCategory(category: String) = PATH_TABLE!!.containsKey(category)
-
-        fun checkFileName(name: String?): Boolean {
-            Log.d(TAG, "checkFileName -> " + name)
-            if (name == null || name.isEmpty() || name.length > 255) {
-                Log.d(TAG, "checkFileName -> bad")
-                return false;
-            } else
-                return name.matches(Regex("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$"));
-        }
-
-        fun isTopPath(path: String, alias: String): Boolean {
-            checkArgument(checkPath(path))
-            if (getNavigationPath(alias).equals(path))
-                return true
-            val parent = File(path).parentFile
-            return if (!parent.exists()) true else parent.list() == null
-        }
-
-        fun listFiles(path: String): List<IFile> {
-            if (!checkPath(path)) {
-                throw IllegalArgumentException("given path not exist")
-            }
-            var file = File(path);
-            var list = file.listFiles()
-            var size = list?.size ?: 0
-            var result = Lists.newArrayListWithCapacity<IFile>(size);
-            if (size > 0) {
-                for (f in list) {
-                    result.add(FileWrapper(f))
-                    Log.d(TAG, f.name)
-                }
-            }
-            return result
-        }
-
-        fun getNavigationPath(alias: String): String? {
-            return PATH_TABLE!![alias]?.first
-        }
-
-        fun getNavigationName(alias: String): Int? {
-            return PATH_TABLE!![alias]?.second
-        }
-
-        fun getMIMEType(suffix: String?) = MIME_MAP!!.get(suffix)
-
+    fun checkPath(path: String): Boolean {
+        val storage = getCategoryPath(IPathModel.STORAGE)
+        Log.d("checkPath", "path = $path, storage = $storage")
+        return path.startsWith(storage!!)
     }
+
+    fun checkFileName(name: String?): Boolean {
+        Log.d(TAG, "checkFileName -> " + name)
+        if (name == null || name.isEmpty() || name.length > 255) {
+            Log.d(TAG, "checkFileName -> bad")
+            return false;
+        } else
+            return name.matches(Regex("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$"));
+    }
+
+    fun getCategoryName(res: Resources, @IPathModel.Category category: Int): String {
+        val resId =
+                when (category) {
+                    CAMERA -> {
+                        R.string.nav_name_camera
+                    }
+                    MUSIC -> {
+                        R.string.nav_name_music
+                    }
+                    PICTURE -> {
+                        R.string.nav_name_picture
+                    }
+                    VIDEO -> {
+                        R.string.nav_name_video
+                    }
+                    DOCUMENT -> {
+                        R.string.nav_name_document
+                    }
+                    DOWNLOAD -> {
+                        R.string.nav_name_download
+                    }
+                    STORAGE -> {
+                        R.string.nav_name_storage
+                    }
+                    else -> {
+                        TODO("bad category")
+                    }
+                }
+        return res.getString(resId)
+    }
+
+    fun getCategoryPath(@IPathModel.Category category: Int): String {
+        return when (category) {
+            CAMERA -> {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+            }
+            MUSIC -> {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).absolutePath
+            }
+            PICTURE -> {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath
+            }
+            VIDEO -> {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).absolutePath
+            }
+            DOCUMENT -> {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath
+            }
+            DOWNLOAD -> {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+            }
+            STORAGE -> {
+                Environment.getExternalStorageDirectory().absolutePath
+            }
+            else -> {
+                TODO("bad category")
+            }
+        }
+    }
+
+    fun getMIMEType(suffix: String?) = MIME_MAP!!.get(suffix)
+
 }
