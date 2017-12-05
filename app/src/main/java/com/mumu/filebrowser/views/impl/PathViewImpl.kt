@@ -5,9 +5,9 @@ import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.widget.TextView
 import com.mumu.filebrowser.views.IPathView
-import presenter.IPathPresenter
-import presenter.IPresenter
-import presenter.impl.PathPresenterImpl
+import com.mumu.filebrowser.presenter.IPathPresenter
+import com.mumu.filebrowser.presenter.IPresenter
+import com.mumu.filebrowser.presenter.impl.PathPresenterImpl
 
 /**
  * Created by leonardo on 17-11-25.

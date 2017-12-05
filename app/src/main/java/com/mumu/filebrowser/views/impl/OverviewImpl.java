@@ -1,7 +1,6 @@
 package com.mumu.filebrowser.views.impl;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -11,15 +10,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mumu.filebrowser.R;
-import com.mumu.filebrowser.file.IFile;
+import com.mumu.filebrowser.utils.PathUtils;
 import com.mumu.filebrowser.views.IOverview;
 
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import presenter.IOverviewPresenter;
-import presenter.IPresenter;
-import presenter.impl.OverviewPresenterImpl;
+
+import com.mumu.filebrowser.presenter.IOverviewPresenter;
+import com.mumu.filebrowser.presenter.IPresenter;
+import com.mumu.filebrowser.presenter.impl.OverviewPresenterImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -79,6 +79,7 @@ public class OverviewImpl extends LinearLayout implements IOverview {
 
     private void showSelectedContent(boolean show) {
         int vis = show ? View.VISIBLE : View.GONE;
+        mIcon.setImageResource(R.drawable.no_preview);
         mCounts.setVisibility(vis);
     }
 
@@ -88,7 +89,8 @@ public class OverviewImpl extends LinearLayout implements IOverview {
         mType.setVisibility(vis);
         mSize.setVisibility(vis);
         mDate.setVisibility(vis);
-        //mIcon.setVisibility(vis);
+        if (!show)
+            mIcon.setImageResource(R.drawable.overview_none);
     }
 
     @Override
@@ -99,45 +101,42 @@ public class OverviewImpl extends LinearLayout implements IOverview {
 
     @Override
     public void cleanDisplay() {
-        getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                showFocusedContent(false);
-                showSelectedContent(false);
-            }
+        getHandler().post(() -> {
+            showFocusedContent(false);
+            showSelectedContent(false);
         });
     }
 
     @Override
-    public void showFocusedview(@NonNull IFile file) {
-        getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                showFocusedContent(true);
-                showSelectedContent(false);
-                boolean isFolder = file.isFolder();
-                mIcon.setImageDrawable(file.getIcon(getResources()).mutate());
-                String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, file.getName());
-                mName.setText(name);
-                String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE + "byte", file.getSize());
-                mSize.setText(size);
-                String suffix = String.format(FILE_TYPE, isFolder ? FOLDER : file.getSuffix());
-                mType.setText(suffix);
-                String date = String.format(FILE_DATE, file.getLastDate(null));
-                mDate.setText(date);
-            }
+    public void showFocusedview(@NonNull String file) {
+        getHandler().post(() -> {
+            showFocusedContent(true);
+            showSelectedContent(false);
+            PathUtils path = PathUtils.Companion.get(file);
+            boolean isFolder = path.isFolder();
+            //mIcon.setImageDrawable(path.getIcon(getResources()).mutate());
+            String name = String.format(isFolder ? FOLDER_NAME : FILE_NAME, path.getName());
+            mName.setText(name);
+            String size = String.format(isFolder ? FOLDER_SIZE : FILE_SIZE + "byte", path.getSize());
+            mSize.setText(size);
+            String suffix = String.format(FILE_TYPE, isFolder ? FOLDER : path.getType());
+            mType.setText(suffix);
+            String date = String.format(FILE_DATE, path.getLastDate(null));
+            mDate.setText(date);
         });
     }
 
     @Override
-    public void showSelectedView(@NonNull IFile... files) {
-        getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                showFocusedContent(false);
-                showSelectedContent(true);
-                mCounts.setText(String.format(FILES_SELECTED, files.length));
+    public void showSelectedView(@NonNull String... files) {
+        getHandler().post(() -> {
+            showFocusedContent(false);
+            showSelectedContent(true);
+            StringBuilder sb = new StringBuilder(String.format(FILES_SELECTED, files.length));
+            sb.append('\n');
+            for (String file : files) {
+                sb.append(PathUtils.Companion.get(file).getName()).append('\n');
             }
+            mCounts.setText(sb.toString());
         });
     }
 

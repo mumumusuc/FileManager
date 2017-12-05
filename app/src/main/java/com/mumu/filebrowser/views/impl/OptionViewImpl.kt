@@ -3,6 +3,7 @@ package com.mumu.filebrowser.views.impl
 import android.content.Context
 import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.DialogInterface.BUTTON_POSITIVE
+import android.content.res.Resources
 import android.support.v7.app.AlertDialog
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -13,9 +14,9 @@ import android.widget.TextView
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.views.IOptionView
 import com.mumu.filebrowser.views.IOptionView.*
-import presenter.IOptionPresenter
-import presenter.IPresenter
-import presenter.impl.OptionPresenterImpl
+import com.mumu.filebrowser.presenter.IOptionPresenter
+import com.mumu.filebrowser.presenter.IPresenter
+import com.mumu.filebrowser.presenter.impl.OptionPresenterImpl
 
 /**
  * Created by leonardo on 17-11-22.
@@ -35,7 +36,6 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
     var mDialog: AlertDialog? = null
     var mDialogView: View? = null
     var mEditor: EditText? = null
-    var mSelector: RadioGroup? = null
     var mMessage: TextView? = null
 
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
@@ -125,8 +125,7 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
             }
             mDialog?.getButton(BUTTON_POSITIVE)?.id -> {
                 val name = mEditor?.text?.toString()
-                val check = if (mSelector?.checkedRadioButtonId == R.id.opt_create_folder) 0 else 1
-                sPresenter.onConfirm(name, check)
+                sPresenter.onConfirm(name)
             }
             mDialog?.getButton(BUTTON_NEGATIVE)?.id -> {
                 sPresenter.onCancel()
@@ -134,7 +133,7 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
         }
     }
 
-    override fun showDialog(title: String, msg: String?, hint: String?, useRadio: Boolean) {
+    override fun showDialog(title: String, msg: String?, hint: String?) {
         if (mDialog == null) {
             createDialog()
         }
@@ -142,7 +141,6 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
             mDialog?.setTitle(title)
         }
         showDialogMessage(msg, msg != null)
-        showDialogSelector(useRadio)
         showDialogEditor(hint, hint != null)
         if (!mDialog!!.isShowing) {
             mDialog!!.show()
@@ -160,10 +158,9 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
         val builder = AlertDialog.Builder(mContext)
         builder.setView(mDialogView)
         mEditor = mDialogView?.findViewById(R.id.dialog_editor)
-        mSelector = mDialogView?.findViewById(R.id.dialog_selector)
         mMessage = mDialogView?.findViewById(R.id.dialog_message)
-        builder.setNegativeButton("取消", null);
-        builder.setPositiveButton("确定", null);
+        builder.setNegativeButton(resources.getString(R.string.opt_dialog_button_cancel), null);
+        builder.setPositiveButton(resources.getString(R.string.opt_dialog_button_confirm), null);
         mDialog = builder.create()
     }
 
@@ -172,10 +169,6 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
         if (!msg.isNullOrBlank()) {
             mMessage?.text = msg
         }
-    }
-
-    private fun showDialogSelector(show: Boolean) {
-        mSelector?.visibility = if (show) VISIBLE else GONE
     }
 
     private fun showDialogEditor(hint: String?, show: Boolean) {

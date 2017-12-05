@@ -1,4 +1,4 @@
-package presenter.impl
+package com.mumu.filebrowser.presenter.impl
 
 import android.content.Context
 import android.util.Log
@@ -6,16 +6,11 @@ import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.Config
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
-import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.impl.PathModel
 import com.mumu.filebrowser.views.IListView
-import presenter.IListPresenter
-import presenter.IPresenter
-import android.content.Intent
-import android.net.Uri
-import android.support.v4.content.FileProvider
-import android.os.Build
+import com.mumu.filebrowser.presenter.IListPresenter
+import com.mumu.filebrowser.presenter.IPresenter
 import android.os.Handler
 import android.os.Message
 import android.view.View
@@ -26,7 +21,7 @@ import com.mumu.filebrowser.eventbus.events.ContentChangeEvent.Companion.INSERT
 import com.mumu.filebrowser.eventbus.events.ContentChangeEvent.Companion.REMOVE
 import com.mumu.filebrowser.model.ILayoutModel
 import com.mumu.filebrowser.model.impl.LayoutModel
-import com.mumu.filebrowser.utils.FileUtils
+import com.mumu.filebrowser.utils.PathUtils
 
 class ListPresenterImpl : IListPresenter<String>, IPresenter {
 
@@ -75,7 +70,7 @@ class ListPresenterImpl : IListPresenter<String>, IPresenter {
             if (Config.doubleClickOpen()) {
                 mListView?.focus(item, true)
             } else {
-                if (FileWrapper.gets(item).isFolder) {
+                if (PathUtils.get(item).isFolder()) {
                     mPathModel.enter(item)
                 } else {
                     EventBus.getInstance().post(OpenEvent(item))
@@ -129,53 +124,82 @@ class ListPresenterImpl : IListPresenter<String>, IPresenter {
     @Subscribe
     fun onSelectedChangeEvent(event: SelectedEvent) {
         val files = event.files
-        Log.d(TAG, "onSelectedFileChange -> ${files.size} changes")
-        if (files.isEmpty()) {
-            mCurrentViewMode = MODE_NORMAL_VIEW
+        Log.d(TAG, "onSelectedFileChange -> ${files?.size ?: 0} changes")
+        if (files == null) {
+            if(mCurrentViewMode == MODE_NORMAL_VIEW){
+                mCurrentViewMode = MODE_MULTI_SELECT
+                mStateModel.clean(false)
+                mCacheList.forEach {
+                    mListView?.select(it,true)
+                    mStateModel.addSelectedFile(it,false)
+                }
+                mStateModel.post()
+            }else {
+                mCurrentViewMode = MODE_NORMAL_VIEW
+                mListView?.select(null, false)
+                mStateModel.clean(true)
+            }
+        }
+        if (files?.isEmpty() == true) {
             EventBus.getInstance().post(FocusedEvent(mPathModel.path))
         }
     }
 
     @Subscribe
     fun onContentChangeEvent(event: ContentChangeEvent) {
-        Log.d(TAG, "onContentChangeEvent")
         when (event.type) {
             INSERT -> {
-                var index: Int = mCacheList.size - 1
-                if (index < 0) {
-                    index = 0
-                } else {
-                    for (i in 0..index) {
-                        if (mFileOrdering.compare(event.name, mCacheList[i]) < 0) {
-                            index = i
-                            break
-                        }
-                    }
-                }
-                mCacheList.add(index, event.name)
-                //TODO: notify view item added at ${index}
-                //mListView?.notifyDataSetChanged()
-                mListView?.notifyItemInserted(index)
+                Log.d(TAG, "onContentChangeEvent -> INSERT ${event.name}")
+                mBufferedQueen.join(INSERT, event.name)
             }
             REMOVE -> {
+                Log.d(TAG, "onContentChangeEvent -> REMOVE ${event.name}")
                 val index = mCacheList.indexOf(event.name)
                 if (index < 0) {
                     return
                 }
-                mBufferedQueen.join(event.name)
+                mBufferedQueen.join(REMOVE, event.name)
             }
         }
     }
 
-    private fun onRemove(list: List<String>) {
+    private fun onInsertOrRemove(list: List<Pair<Int, String>>) {
         if (list.isNotEmpty()) {
             list.forEachIndexed { index, value ->
                 run {
-                    if (mCacheList.remove(value)) {
-                        //TODO: notify view item added at ${index}
-                        //mListView?.notifyDataSetChanged()
-                        mListView?.notifyItemRemoved(index)
-                        mStateModel.removeSelectedFile(value, false)
+                    val type = value.first
+                    val path = value.second
+                    when (type) {
+                        INSERT -> {
+                            Log.d(TAG, "onInsertOrRemove -> INSERT $value")
+                            var index: Int = mCacheList.size - 1
+                            if (index < 0) {
+                                index = 0
+                            } else {
+                                for (i in 0..index) {
+                                    if (mFileOrdering.compare(path, mCacheList[i]) < 0) {
+                                        index = i
+                                        break
+                                    }
+                                }
+                            }
+                            mCacheList.add(index, path)
+                            //TODO: notify view item added at ${index}
+                            mListView?.notifyItemInserted(index)
+                        }
+                        REMOVE -> {
+                            val i = mCacheList.indexOf(path)
+                            if (i >= 0) {
+                                Log.d(TAG, "onInsertOrRemove -> REMOVE $value")
+                                mCacheList.remove(path)
+                                //TODO: notify view item added at ${index}
+                                mListView?.notifyItemRemoved(i)
+                                mStateModel.removeSelectedFile(path, false)
+                            } else {
+                            }
+                        }
+                        else -> {
+                        }
                     }
                 }
             }
@@ -214,23 +238,21 @@ class ListPresenterImpl : IListPresenter<String>, IPresenter {
 
     private inner class BufferedQueue {
         private val TIME_DELAY = 200L;
-        private val sQueue = Queues.newArrayBlockingQueue<String>(10)
+        private val sQueue = Queues.newArrayBlockingQueue<Pair<Int, String>>(10)
         private val sHandler = object : Handler() {
             override fun handleMessage(msg: Message?) {
+                if (msg == null) {
+                    return
+                }
                 synchronized(sQueue) {
-                    val list = mutableListOf<String>()
-                    var item = sQueue.poll()
-                    while (item != null) {
-                        list.add(item)
-                        item = sQueue.poll()
-                    }
-                    onRemove(list.toList())
+                    onInsertOrRemove(sQueue.toList())
+                    sQueue.clear()
                 }
             }
         }
 
-        fun join(value: String) {
-            sQueue.put(value)
+        fun join(type: Int, value: String) {
+            sQueue.put(Pair(type, value))
             sHandler.removeCallbacksAndMessages(null)
             sHandler.sendEmptyMessageDelayed(0, TIME_DELAY)
         }

@@ -1,4 +1,4 @@
-package presenter.impl
+package com.mumu.filebrowser.presenter.impl
 
 import android.content.Context
 import android.graphics.Canvas
@@ -17,10 +17,10 @@ import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.PathChangeEvent
 import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.impl.PathModel
-import com.mumu.filebrowser.utils.FileUtils
+import com.mumu.filebrowser.utils.Utils
 import com.mumu.filebrowser.views.IPathView
-import presenter.IPathPresenter
-import presenter.IPresenter
+import com.mumu.filebrowser.presenter.IPathPresenter
+import com.mumu.filebrowser.presenter.IPresenter
 import java.io.File
 
 /**
@@ -28,7 +28,7 @@ import java.io.File
  */
 class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
     private val mContext = context
-    private val SPAN_IMG = "img"
+    private val SPAN_IMG = "    〉 "
     private val mPath: MutableList<String> = arrayListOf()
     private val mSSB: SpannableStringBuilder = SpannableStringBuilder();
     private var mPathView: IPathView? = null
@@ -43,16 +43,19 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
 
     override fun <IPathView> bindView(view: IPathView?) {
         mPathView = if (view == null) view else view as com.mumu.filebrowser.views.IPathView
+        if (mPathView != null) {
+            onPathChangeEvent(PathChangeEvent())
+        }
     }
 
     private fun addClickablePart(str: String): SpannableStringBuilder? {
         mSSB.clear()
         mSSB.clearSpans()
-        val subs = FileUtils.getCategoryPath(mPathModel.category)
+        val subs = Utils.getCategoryPath(mPathModel.category)
         val str = str.substring(subs!!.length, str.length)
         mPath.clear()
         mPath.addAll(Splitter.on(File.separatorChar).omitEmptyStrings().splitToList(str))
-        val aliasName = FileUtils.getCategoryName(mContext.resources, mPathModel.category)
+        val aliasName = Utils.getCategoryName(mContext.resources, mPathModel.category)
         mSSB.append(aliasName)
         mSSB.setSpan(
                 object : ClickableSpan() {
@@ -72,8 +75,8 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
             val start = mSSB.length
             val part = mPath.get(i)
             mSSB.append(SPAN_IMG).append(part)
-            val arrow = CenterImageSpan(mContext, R.drawable.ic_path_arrow, CenterImageSpan.ALIGN_CENTER)
-            mSSB.setSpan(arrow, start, start + SPAN_IMG.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+            //val arrow = CenterImageSpan(mContext, R.drawable.ic_path_arrow, CenterImageSpan.ALIGN_CENTER)
+            //mSSB.setSpan(arrow, start, start + SPAN_IMG.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
             val sub = mPath.subList(0, i + 1)
             mSSB.setSpan(
                     object : ClickableSpan() {
@@ -99,7 +102,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
             return null
         }
         mSSB.clear()
-        mSSB.append(FileUtils.getCategoryPath(mPathModel.category))
+        mSSB.append(Utils.getCategoryPath(mPathModel.category))
         for (str in pathlist) {
             mSSB.append(File.separatorChar).append(str)
         }

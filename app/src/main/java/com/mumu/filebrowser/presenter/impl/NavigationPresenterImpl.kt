@@ -1,11 +1,10 @@
-package presenter.impl
+package com.mumu.filebrowser.presenter.impl
 
 import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.impl.PathModel
-import com.mumu.filebrowser.utils.FileUtils
 import com.mumu.filebrowser.views.INavigationView
-import presenter.INavigationPresenter
-import presenter.IPresenter
+import com.mumu.filebrowser.presenter.INavigationPresenter
+import com.mumu.filebrowser.presenter.IPresenter
 
 /**
  * Created by leonardo on 17-11-24.

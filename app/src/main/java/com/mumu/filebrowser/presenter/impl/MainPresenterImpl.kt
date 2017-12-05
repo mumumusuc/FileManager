@@ -1,4 +1,4 @@
-package presenter.impl
+package com.mumu.filebrowser.presenter.impl
 
 
 import android.content.Intent
@@ -9,17 +9,16 @@ import com.google.common.eventbus.Subscribe
 import com.google.common.io.Files
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.OpenEvent
-import com.mumu.filebrowser.file.FileWrapper
-import com.mumu.filebrowser.utils.FileUtils
+import com.mumu.filebrowser.utils.Utils
 import com.mumu.filebrowser.views.IMainView
-import presenter.IMainPresenter
-import presenter.IPresenter
+import com.mumu.filebrowser.presenter.IMainPresenter
+import com.mumu.filebrowser.presenter.IPresenter
 import java.io.File
 
 /**
  * Created by leonardo on 17-11-24.
  */
-class MainPresenterImpl() : IMainPresenter, IPresenter {
+class MainPresenterImpl : IMainPresenter, IPresenter {
     var mMainView: IMainView? = null
 
     init {
@@ -36,7 +35,7 @@ class MainPresenterImpl() : IMainPresenter, IPresenter {
             return
         }
         val path = event.path
-        val type = FileUtils.getMIMEType(Files.getFileExtension(path)) ?: return
+        val type = Utils.getMIMEType(Files.getFileExtension(path)) ?: return
         val intent = Intent()
         intent.action = android.content.Intent.ACTION_VIEW
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

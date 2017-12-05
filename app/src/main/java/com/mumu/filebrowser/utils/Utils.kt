@@ -1,18 +1,20 @@
 package com.mumu.filebrowser.utils
 
+import android.content.Context
 import android.content.res.Resources
 import android.os.Environment
 import android.util.Log
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.IPathModel.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
-/**
- * Created by leonardo on 17-11-12.
- */
-object FileUtils {
-    private val TAG = FileUtils::class.java.simpleName
-
+object Utils {
+    private val TAG = Utils::class.java.simpleName
+    val MIME_FILE = "mime.json"
     var MIME_MAP: Map<String, String>? = null
 
     fun checkPath(path: String): Boolean {
@@ -90,6 +92,32 @@ object FileUtils {
         }
     }
 
+    fun init(context: Context) {
+        val g = GsonBuilder().create()
+        val inputReader = InputStreamReader(context.assets.open(MIME_FILE))!!
+        val bufReader = BufferedReader(inputReader)
+        val sb = StringBuilder()
+        var line: String? = bufReader.readLine()
+        while (line != null) {
+            sb.append(line)
+            line = bufReader.readLine()
+        }
+        MIME_MAP = g.fromJson(
+                sb.toString(),
+                object : TypeToken<Map<String, String>>() {}.type)
+    }
+
     fun getMIMEType(suffix: String?) = MIME_MAP!!.get(suffix)
 
+    fun getImageSnap(){
+
+    }
+
+    fun getVideoSnap(){
+
+    }
+
+    fun getAudioSnap(){
+
+    }
 }

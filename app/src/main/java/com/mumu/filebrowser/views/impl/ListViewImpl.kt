@@ -19,11 +19,11 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.mumu.filebrowser.R
-import com.mumu.filebrowser.file.FileWrapper
 import com.mumu.filebrowser.views.IListView
-import presenter.IListPresenter
-import presenter.IPresenter
-import presenter.impl.ListPresenterImpl
+import com.mumu.filebrowser.presenter.IListPresenter
+import com.mumu.filebrowser.presenter.IPresenter
+import com.mumu.filebrowser.presenter.impl.ListPresenterImpl
+import com.mumu.filebrowser.utils.PathUtils
 
 class ListViewImpl : FrameLayout, IListView<String>, View.OnClickListener, View.OnLongClickListener {
     companion object {
@@ -73,7 +73,7 @@ class ListViewImpl : FrameLayout, IListView<String>, View.OnClickListener, View.
     }
 
     override fun showAsGrid(anim: Boolean) {
-        (mRecyclerView?.layoutManager as StaggeredGridLayoutManager)?.spanCount = 5
+        (mRecyclerView?.layoutManager as StaggeredGridLayoutManager)?.spanCount = 6
     }
 
     override fun notifyDataSetChanged() {
@@ -106,7 +106,19 @@ class ListViewImpl : FrameLayout, IListView<String>, View.OnClickListener, View.
         setEmptyView(View.inflate(context, layout, null))
     }
 
-    override fun select(items: String, selected: Boolean) {
+    override fun select(items: String?, selected: Boolean) {
+        if (items == null) {
+            for (i in 0..(mRecyclerView!!.childCount - 1)) {
+                val view = mRecyclerView!!.getChildAt(i)
+                if (!view.isSelected) {
+                    continue
+                }
+                view.isSelected = false
+                val holder = mRecyclerView?.getChildViewHolder(view) as SimpleViewHolder
+                holder.mDrawable?.setSelected(false, true)
+            }
+            return
+        }
         for (i in 0..(mRecyclerView!!.childCount - 1)) {
             val view = mRecyclerView!!.getChildAt(i)
             if (items == view.tag) {
@@ -145,14 +157,14 @@ class ListViewImpl : FrameLayout, IListView<String>, View.OnClickListener, View.
             if (holder is SimpleViewHolder) {
                 val name = sListPresenter!!.list.get(position)
                 Log.i("onBindViewHolder", "onBindViewHolder -> bind $name")
-                val file = FileWrapper.gets(name)
-                holder.mItemName!!.setText(file.name)
+                val file = PathUtils.get(name)
+                holder.mItemName!!.text = file.getName()
                 val icon = DrawableCompat.wrap(file.getIcon(resources))
                 val selectedDrawable = resources.getDrawable(R.drawable.ic_item_selected, null)
                 val drawable = SelectDrawable(
                         arrayOf(icon.mutate(), selectedDrawable.mutate()))
                 holder.setDrawable(drawable)
-                val selected = sListPresenter.isItemSelected(file.path)
+                val selected = sListPresenter.isItemSelected(name)
                 drawable.setSelected(selected, false)
                 holder.mItem!!.isSelected = selected
                 holder.mItem!!.tag = name

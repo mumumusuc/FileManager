@@ -1,12 +1,6 @@
-package presenter;
-
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
+package com.mumu.filebrowser.presenter;
 
 import com.mumu.filebrowser.model.IPathModel;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by leonardo on 17-11-24.

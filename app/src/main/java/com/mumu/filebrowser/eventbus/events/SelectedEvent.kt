@@ -1,10 +1,9 @@
 package com.mumu.filebrowser.eventbus.events
 
-import com.mumu.filebrowser.file.IFile
-
-/**
- * Created by leonardo on 17-11-22.
- */
-class SelectedEvent(files: Array<String>) {
+class SelectedEvent(files: Array<String>?) {
+    /**
+     * @param files    null:=select_all
+     *                 size0:=select_none
+     */
     val files = files
 }

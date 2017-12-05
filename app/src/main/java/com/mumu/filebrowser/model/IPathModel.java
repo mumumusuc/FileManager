@@ -3,8 +3,6 @@ package com.mumu.filebrowser.model;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
-import com.mumu.filebrowser.file.IFile;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
@@ -41,7 +39,15 @@ public interface IPathModel {
     @NonNull
     String getPath();
 
+    boolean havePreviousPath();
     boolean enterPrevious();
+
+    boolean haveNextPath();
+    boolean enterNext();
+
+    boolean enterParent();
+
+    void refresh();
 
     @NonNull
     List<String> listFiles();

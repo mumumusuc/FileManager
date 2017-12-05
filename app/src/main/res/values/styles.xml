@@ -37,10 +37,24 @@
     </style>
 
     <style name="OverviewTextTheme">
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">16dp</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
     </style>
 
+    <style name="ToolTextTheme" parent="@android:style/TextAppearance.Material.Button">
+        <item name="android:clickable">true</item>
+        <item name="android:background">@drawable/tool_button_ripple_bg</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:drawableTint">@color/tool_color_selector</item>
+    </style>
 </resources>

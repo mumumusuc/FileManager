@@ -12,7 +12,7 @@ public interface IToolView {
 
     void showGridIcon();
 
-    boolean onActionItemSelected(@NonNull MenuItem item);
+    void enableAction(int action, boolean enable);
 
     boolean cancelAllActions();
 }

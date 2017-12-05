@@ -3,17 +3,12 @@ package com.mumu.filebrowser.utils
 import android.support.annotation.IntDef
 import android.util.Log
 import com.google.common.io.Files
-import com.mumu.filebrowser.file.FileWrapper
-import com.mumu.filebrowser.file.IFile
+import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.IOException
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
 
-
-/**
- * Created by leonardo on 17-11-21.
- */
 object OptionUtils {
     private val TAG = OptionUtils.javaClass.simpleName
 
@@ -22,12 +17,12 @@ object OptionUtils {
         checkNotNull(to, { "Copy target file name must NOT be null." })
         val sourceFile = File(from)
         val targetFile = File(to)
-        if (!sourceFile.exists() || targetFile.exists()) {
-            Log.e(TAG, "source file not exist or target file already exist")
-            return ERROR_FILE_EXIST
-        }
         try {
-            Files.copy(sourceFile, targetFile)
+            if (sourceFile.isFile) {
+                FileUtils.copyFileToDirectory(sourceFile, targetFile)
+            } else if (sourceFile.isDirectory) {
+                FileUtils.copyDirectoryToDirectory(sourceFile, targetFile)
+            }
         } catch (fileIoEx: IOException) {
             Log.e(TAG, "ERROR trying to copy file '$from' to file '$to' - ${fileIoEx.toString()}")
             return IO_FAILED
@@ -40,29 +35,37 @@ object OptionUtils {
         checkNotNull(to, { "move target file name must NOT be null." })
         val sourceFile = File(from)
         val targetFile = File(to)
-        if (!sourceFile.exists() || targetFile.exists()) {
-            Log.e(TAG, "source file not exist or target file already exist")
-            return ERROR_FILE_EXIST
-        }
         try {
-            Files.move(sourceFile, targetFile)
+            if (sourceFile.isFile) {
+                FileUtils.moveFileToDirectory(sourceFile, targetFile, false)
+            } else if (sourceFile.isDirectory) {
+                FileUtils.moveDirectoryToDirectory(sourceFile, targetFile, false)
+            }
         } catch (fileIoEx: IOException) {
-            Log.e(TAG, "ERROR trying to copy file '$from' to file '$to' - ${fileIoEx.toString()}")
+            Log.e(TAG, "ERROR trying to move file '$from' to file '$to' \n ${fileIoEx.toString()}")
             return IO_FAILED
         }
         return NO_ERROR
     }
 
     fun rename(from: String, newName: String): Int {
-        if (!FileUtils.checkFileName(newName)) {
-            Log.e(TAG, "rename bad name")
-            return ERROR_BAD_PATH
+        val srcFile = File(from)
+        val dstFile = File(newName)
+        try {
+            if (srcFile.isFile) {
+                FileUtils.moveFile(srcFile, dstFile)
+            } else if (srcFile.isDirectory) {
+                FileUtils.moveDirectory(srcFile, dstFile)
+            }
+        } catch (fileIoEx: IOException) {
+            Log.e(TAG, "ERROR trying to rename file '$from' to '$newName' \n ${fileIoEx.toString()}")
+            return IO_FAILED
         }
-        return move(from, File(from).parent + File.separatorChar + newName)
+        return NO_ERROR
     }
 
     fun delete(path: String): Int {
-        Log.i(TAG,"need delete $path")
+        Log.i(TAG, "need delete $path")
         val file = File(path)
         if (!file.exists()) {
             Log.e(TAG, "delete bad path")
@@ -87,7 +90,7 @@ object OptionUtils {
     }
 
     fun create(name: String?, @CreateType type: Long): Int {
-        if (name.isNullOrBlank() || !FileUtils.checkPath(name!!)) {
+        if (name.isNullOrBlank() || !Utils.checkPath(name!!)) {
             return ERROR_BAD_PATH
         }
         Log.d("create", "name = " + name)

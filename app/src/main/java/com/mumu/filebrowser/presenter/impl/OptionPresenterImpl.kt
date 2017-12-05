@@ -1,34 +1,27 @@
-package presenter.impl
+package com.mumu.filebrowser.presenter.impl
 
-import android.content.res.Resources
 import android.util.Log
-import android.view.View
 import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.SelectedEvent
-import com.mumu.filebrowser.file.IFile
 import com.mumu.filebrowser.model.IPathModel
 import com.mumu.filebrowser.model.impl.PathModel
-import com.mumu.filebrowser.utils.FileUtils
+import com.mumu.filebrowser.utils.Utils
 import com.mumu.filebrowser.utils.OptionUtils
 import com.mumu.filebrowser.utils.OptionUtils.CREATE_TYPE_FILE
 import com.mumu.filebrowser.utils.OptionUtils.CREATE_TYPE_FOLDER
 import com.mumu.filebrowser.utils.OptionUtils.NO_ERROR
 import com.mumu.filebrowser.views.IOptionView
 import com.mumu.filebrowser.views.IOptionView.*
-import presenter.IOptionPresenter
-import presenter.IPresenter
+import com.mumu.filebrowser.presenter.IOptionPresenter
+import com.mumu.filebrowser.presenter.IPresenter
 import java.io.File
 
-/**
- * Created by leonardo on 17-11-27.
- */
 class OptionPresenterImpl : IOptionPresenter, IPresenter {
     private val TAG = OptionPresenterImpl::class.java.simpleName
 
     private var mOptionView: IOptionView? = null
-    private var mResources: Resources? = null
     private val mPathModel: IPathModel = PathModel
     private var mState: Int = NULL
     private val mSelectedFiles = mutableSetOf<String>()
@@ -39,59 +32,65 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
 
     override fun <IOptionView> bindView(view: IOptionView?) {
         mOptionView = if (view == null) null else view as com.mumu.filebrowser.views.IOptionView
-        if (view != null && view is View) {
-            mResources = (view as View).context.resources
+        if (view != null) {
             setOptionState(mSelectedFiles.size)
-        } else {
-            mResources = null
         }
     }
 
     override fun onCopy() {
         mState = COPY
+        mOptionView?.enableOption(NULL, false)
+        mOptionView?.enableOption(CUT, true)
+        mOptionView?.enableOption(PASTE, true)
+        mOptionView?.enableOption(DELETE, true)
+        EventBus.getInstance().post(SelectedEvent(null))
     }
 
     override fun onMove() {
         mState = CUT
+        mOptionView?.enableOption(NULL, false)
+        mOptionView?.enableOption(COPY, true)
+        mOptionView?.enableOption(PASTE, true)
+        mOptionView?.enableOption(DELETE, true)
+        EventBus.getInstance().post(SelectedEvent(null))
     }
 
     override fun onRename() {
         mState = RENAME
-
+        val res = mOptionView?.resources
         mOptionView?.showDialog(
-                mResources?.getString(R.string.opt_name_rename),
+                res?.getString(R.string.opt_name_rename),
                 null,
-                mResources?.getString(R.string.opt_msg_rename),
-                false
+                res?.getString(R.string.opt_msg_rename)
         )
     }
 
     override fun onDelete() {
         mState = DELETE
+        val res = mOptionView?.resources
         mOptionView?.showDialog(
-                mResources?.getString(R.string.opt_name_delete),
-                mResources?.getString(R.string.opt_msg_delete),
-                null,
-                false
+                res?.getString(R.string.opt_name_delete),
+                res?.getString(R.string.opt_msg_delete),
+                null
         )
     }
 
     override fun onCreate() {
         mState = CREATE
+        val res = mOptionView?.resources
         mOptionView?.showDialog(
-                mResources?.getString(R.string.opt_name_create),
+                res?.getString(R.string.opt_name_create),
                 null,
-                mResources?.getString(R.string.opt_msg_create),
-                true
+                res?.getString(R.string.opt_msg_create)
         )
     }
 
     override fun onPaste() {
+        val res = mOptionView?.resources
         mOptionView?.showDialog(
-                mResources?.getString(R.string.opt_name_paste),
-                mResources?.getString(R.string.opt_msg_paste),
-                null,
-                true
+                res?.getString(R.string.opt_name_paste),
+                res?.getString(R.string.opt_msg_paste),
+                null
         )
     }
 
@@ -100,30 +99,23 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
         mOptionView?.dismissDialog()
     }
 
-    override fun onConfirm(content: String?, select: Int) {
+    override fun onConfirm(content: String?) {
+        val res = mOptionView?.resources
         when (mState) {
             CREATE -> {
-                val legal: Boolean = FileUtils.checkFileName(content)
+                val legal: Boolean = Utils.checkFileName(content)
                 if (legal) {
-                    val state = OptionUtils.create(
-                            buildFullPath(content!!),
-                            when (select) {
-                                0 -> {
-                                    CREATE_TYPE_FOLDER
-                                }
-                                else -> {
-                                    CREATE_TYPE_FILE
-                                }
-                            }
+                    val state = OptionUtils.create(buildFullPath(content!!), CREATE_TYPE_FOLDER
                     )
                     Log.i("OptionPresenterImpl", "state = $state")
                     if (state == NO_ERROR) {
                         onCancel()
                     } else {
-                        mOptionView?.showDialog("", "文件已存在", "", true)
+                        mOptionView?.showDialog("", res?.getString(R.string.opt_error_file_exist), "")
                     }
                 } else {
-                    mOptionView?.showDialog("", "请检查文件名是否正确", "", true)
+                    Log.i(TAG,"illegal name,show warning")
+                    mOptionView?.showDialog("", res?.getString(R.string.opt_error_bad_name), "")
                 }
             }
             DELETE -> {
@@ -135,7 +127,7 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
                 onCancel()
             }
             RENAME -> {
-                val legal: Boolean = FileUtils.checkFileName(content)
+                val legal: Boolean = Utils.checkFileName(content)
                 if (legal) {
                     val state = OptionUtils.rename(
                             mSelectedFiles.toTypedArray()[0],
@@ -143,8 +135,26 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
                     Log.w("OptionPresenterImpl", "rename = $state")
                     onCancel()
                 } else {
-                    mOptionView?.showDialog("", "请检查文件名是否正确", "", true)
+                    mOptionView?.showDialog("", res?.getString(R.string.opt_error_bad_name), "")
                 }
+            }
+            COPY -> {
+                val targetPath = mPathModel.path
+                mSelectedFiles.forEach {
+                    val state = OptionUtils.copy(it, targetPath)
+                    Log.w("OptionPresenterImpl", "copy = $it, state = $state")
+                }
+                mOptionView?.dismissDialog()
+                mState = NULL
+            }
+            CUT -> {
+                val targetPath = mPathModel.path
+                mSelectedFiles.forEach {
+                    val state = OptionUtils.move(it, targetPath)
+                    Log.w("OptionPresenterImpl", "move = $it, state = $state")
+                }
+                mOptionView?.dismissDialog()
+                mState = NULL
             }
         }
 
@@ -154,8 +164,13 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
 
     @Subscribe
     fun onSelectedFileChange(event: SelectedEvent) {
+        if (mState == COPY || mState == CUT) {
+            return
+        }
         mSelectedFiles.clear()
-        mSelectedFiles.addAll(event.files)
+        if (event.files != null) {
+            mSelectedFiles.addAll(event.files)
+        }
         Log.d(TAG, "onSelectedFileChange -> ${mSelectedFiles.size} changes")
         setOptionState(mSelectedFiles.size)
     }

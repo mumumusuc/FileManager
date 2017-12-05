@@ -1,4 +1,4 @@
-package presenter;
+package com.mumu.filebrowser.presenter;
 
 import android.support.annotation.NonNull;
 

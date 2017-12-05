@@ -11,8 +11,8 @@
 
     <ImageView
         android:id="@+id/item_icon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="@dimen/grid_icon_size"
+        android:layout_height="@dimen/grid_icon_size"
         android:layout_margin="8dp"
         android:src="@drawable/ic_item_file" />
 

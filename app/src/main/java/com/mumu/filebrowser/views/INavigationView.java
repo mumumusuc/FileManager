@@ -2,8 +2,6 @@ package com.mumu.filebrowser.views;
 
 import com.mumu.filebrowser.model.IPathModel;
 
-import presenter.INavigationPresenter;
-
 /**
  * Created by leonardo on 17-11-24.
  */

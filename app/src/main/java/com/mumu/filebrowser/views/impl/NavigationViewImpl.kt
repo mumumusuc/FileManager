@@ -4,16 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.support.design.widget.NavigationView
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MenuItem
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.model.IPathModel.*
 import com.mumu.filebrowser.views.INavigationView
-import presenter.INavigationPresenter
-import presenter.IPresenter
-import presenter.impl.NavigationPresenterImpl
+import com.mumu.filebrowser.presenter.INavigationPresenter
+import com.mumu.filebrowser.presenter.IPresenter
+import com.mumu.filebrowser.presenter.impl.NavigationPresenterImpl
 
 /**
  * Created by leonardo on 17-11-24.

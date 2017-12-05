@@ -6,11 +6,15 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="item_icon_size">28dp</dimen>
-    <dimen name="item_text_size">22sp</dimen>
 
-    <dimen name="overview_panel_width">300dp</dimen>
-    <dimen name="overview_image_size">250dp</dimen>
+    <dimen name="overview_panel_width">350dp</dimen>
+    <dimen name="overview_image_size">300dp</dimen>
+
+    <dimen name="divider_width">1dp</dimen>
+
+    <dimen name="list_icon_size">28dp</dimen>
+    <dimen name="grid_icon_size">56dp</dimen>
+    <dimen name="item_text_size">18sp</dimen>
 
     <integer name="item_icon_animation_duration">250</integer>
-    <dimen name="divider_width">1dp</dimen>
 </resources>

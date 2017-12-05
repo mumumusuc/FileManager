@@ -6,6 +6,6 @@ package com.mumu.filebrowser
 class Config {
     companion object {
         fun doubleClickOpen() = false
-        fun backControlPath() = false
+        fun backControlPath() = true
     }
 }

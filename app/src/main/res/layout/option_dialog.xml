@@ -5,37 +5,16 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <TextView
-        android:text="dialog_message"
-        android:id="@+id/dialog_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <RadioGroup
-        android:id="@+id/dialog_selector"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checkedButton="@+id/opt_create_folder"
-        android:gravity="end"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/opt_create_folder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="文件夹" />
-
-        <RadioButton
-            android:id="@+id/opt_create_file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="文件" />
-    </RadioGroup>
-
     <EditText
         android:id="@+id/dialog_editor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"/>
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="dialog_message"
+        android:textColor="?attr/colorAccent" />
 </LinearLayout>

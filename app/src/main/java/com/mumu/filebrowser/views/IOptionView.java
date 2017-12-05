@@ -1,6 +1,8 @@
 package com.mumu.filebrowser.views;
 
+import android.content.res.Resources;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,7 +26,10 @@ public interface IOptionView {
     @interface Option {
     }
 
-    void showDialog(String title, String msg, String hint, boolean useRadio);
+    @NonNull
+    Resources getResources();
+
+    void showDialog(String title, String msg, String hint);
 
     void dismissDialog();
 
