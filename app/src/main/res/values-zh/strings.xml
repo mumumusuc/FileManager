@@ -52,4 +52,5 @@
     <string name="opt_error_bad_name">请检查文件名是否正确</string>
 
     <string name="empty">无内容</string>
+    <string name="tool_search_hint">输入文件名</string>
 </resources>

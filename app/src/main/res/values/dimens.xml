@@ -16,5 +16,7 @@
     <dimen name="grid_icon_size">56dp</dimen>
     <dimen name="item_text_size">18sp</dimen>
 
+    <dimen name="tool_search_input_width">300dp</dimen>
+
     <integer name="item_icon_animation_duration">250</integer>
 </resources>

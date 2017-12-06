@@ -141,6 +141,7 @@ class ListPresenterImpl : IListPresenter<String>, IPresenter {
             }
         }
         if (files?.isEmpty() == true) {
+            mCurrentViewMode = MODE_NORMAL_VIEW
             EventBus.getInstance().post(FocusedEvent(mPathModel.path))
         }
     }

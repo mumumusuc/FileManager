@@ -131,6 +131,7 @@ class PathPresenterImpl(context: Context) : IPathPresenter, IPresenter {
 
     @Subscribe
     fun onPathChangeEvent(event: PathChangeEvent) {
-        mPathView?.showPath(addClickablePart(mPathModel.path) as CharSequence)
+        if (!mPathModel.path.isNullOrBlank())
+            mPathView?.showPath(addClickablePart(mPathModel.path) as CharSequence)
     }
 }

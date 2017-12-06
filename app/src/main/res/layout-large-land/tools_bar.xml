@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.mumu.filebrowser.views.impl.ToolViewImpl2 xmlns:android="http://schemas.android.com/apk/res/android"
+<com.mumu.filebrowser.views.impl.ToolViewImpl xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tool_pre"
-        style="@style/ToolTextTheme"
-        android:drawableStart="@drawable/ic_tool_preview"
-        android:text="@string/tool_title_pre" />
-
-    <TextView
-        android:id="@+id/tool_next"
-        style="@style/ToolTextTheme"
-        android:drawableStart="@drawable/ic_tool_next"
-        android:text="@string/tool_title_next" />
+    <include
+        layout="@layout/tool_bar_action_search" />
 
     <TextView
         android:id="@+id/tool_select"
@@ -36,9 +27,14 @@
         android:text="@string/tool_title_grid" />
 
     <TextView
-        android:id="@+id/tool_search"
+        android:id="@+id/tool_pre"
         style="@style/ToolTextTheme"
-        android:drawableStart="@drawable/ic_tool_search"
-        android:text="@string/tool_title_search" />
+        android:drawableStart="@drawable/ic_tool_preview"
+        android:text="@string/tool_title_pre" />
 
-</com.mumu.filebrowser.views.impl.ToolViewImpl2>
+    <TextView
+        android:id="@+id/tool_next"
+        style="@style/ToolTextTheme"
+        android:drawableStart="@drawable/ic_tool_next"
+        android:text="@string/tool_title_next" />
+</com.mumu.filebrowser.views.impl.ToolViewImpl>

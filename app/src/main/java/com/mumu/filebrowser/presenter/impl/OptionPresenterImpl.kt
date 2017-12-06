@@ -1,5 +1,6 @@
 package com.mumu.filebrowser.presenter.impl
 
+import android.os.AsyncTask
 import android.util.Log
 import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.R
@@ -114,17 +115,24 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
                         mOptionView?.showDialog("", res?.getString(R.string.opt_error_file_exist), "")
                     }
                 } else {
-                    Log.i(TAG,"illegal name,show warning")
+                    Log.i(TAG, "illegal name,show warning")
                     mOptionView?.showDialog("", res?.getString(R.string.opt_error_bad_name), "")
                 }
             }
             DELETE -> {
-                var state: Int
-                mSelectedFiles.map {
+                //var state: Int
+                /*mSelectedFiles.map {
                     state = OptionUtils.delete(it)
                     Log.i("OptionPresenterImpl", "delete = $state")
-                }
-                onCancel()
+                }*/
+                BackgroundProcess().execute(object : Processor<String> {
+                    override fun process(arg: String): Boolean {
+                        val state = OptionUtils.delete(arg)
+                        Log.i(TAG, "deleting = ${arg}")
+                        return state == NO_ERROR
+                    }
+                })
+                //onCancel()
             }
             RENAME -> {
                 val legal: Boolean = Utils.checkFileName(content)
@@ -140,21 +148,33 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
             }
             COPY -> {
                 val targetPath = mPathModel.path
-                mSelectedFiles.forEach {
+                /*mSelectedFiles.forEach {
                     val state = OptionUtils.copy(it, targetPath)
                     Log.w("OptionPresenterImpl", "copy = $it, state = $state")
-                }
-                mOptionView?.dismissDialog()
-                mState = NULL
+                }*/
+                BackgroundProcess().execute(object : Processor<String> {
+                    override fun process(arg: String): Boolean {
+                        val state = OptionUtils.copy(arg, targetPath)
+                        Log.i(TAG, "copying = ${arg}")
+                        return state == NO_ERROR
+                    }
+                })
+                //onCancel()
             }
             CUT -> {
                 val targetPath = mPathModel.path
-                mSelectedFiles.forEach {
-                    val state = OptionUtils.move(it, targetPath)
-                    Log.w("OptionPresenterImpl", "move = $it, state = $state")
-                }
-                mOptionView?.dismissDialog()
-                mState = NULL
+                /*mSelectedFiles.forEach {
+                        val state = OptionUtils.move(it, targetPath)
+                        Log.w("OptionPresenterImpl", "move = $it, state = $state")
+                    }*/
+                BackgroundProcess().execute(object : Processor<String> {
+                    override fun process(arg: String): Boolean {
+                        val state = OptionUtils.move(arg, targetPath)
+                        Log.i(TAG, "moving = ${arg}")
+                        return state == NO_ERROR
+                    }
+                })
+                // onCancel()
             }
         }
 
@@ -193,4 +213,41 @@ class OptionPresenterImpl : IOptionPresenter, IPresenter {
             }
         }
     }
+
+    private interface Processor<T> {
+        fun process(arg: T): Boolean
+    }
+
+    private inner class BackgroundProcess : AsyncTask<Processor<String>, Float, Pair<Int, Int>>() {
+        override fun doInBackground(vararg params: Processor<String>?): Pair<Int, Int> {
+            if (params?.isEmpty() || mSelectedFiles?.isEmpty()) {
+                return Pair(0, 0)
+            }
+            var sucessedCnt = 0
+            val total = mSelectedFiles.size
+            mSelectedFiles.forEachIndexed { index, s ->
+                run {
+                    val result = params[0]?.process(s) ?: false
+                    Log.d(TAG, "processing ${s} ... ${if (result) "success" else "failed"}")
+                    if (result) {
+                        sucessedCnt++
+                        publishProgress(sucessedCnt / total.toFloat())
+                    }
+                }
+            }
+            return Pair(sucessedCnt, total)
+        }
+
+        override fun onProgressUpdate(vararg values: Float?) {
+            //TODO : show progress
+            Log.d(TAG, "completing ${(values?.get(0) ?: 0f) * 100}%")
+            mOptionView?.showProgress(values?.get(0) ?: 0f)
+        }
+
+        override fun onPostExecute(result: Pair<Int, Int>?) {
+            Log.d(TAG, "onResout -> {${result?.first},${result?.second}}")
+            mOptionView?.dismissProgress()
+        }
+    }
+
 }

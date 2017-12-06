@@ -11,6 +11,8 @@ import com.mumu.filebrowser.eventbus.events.ContentChangeEvent
 import com.mumu.filebrowser.eventbus.events.ContentChangeEvent.Companion.INSERT
 import com.mumu.filebrowser.eventbus.events.ContentChangeEvent.Companion.REMOVE
 import com.mumu.filebrowser.eventbus.events.PathChangeEvent
+import com.mumu.filebrowser.utils.PathUtils
+import org.apache.commons.io.FileUtils
 import java.util.*
 
 object PathModel : IPathModel {
@@ -20,11 +22,23 @@ object PathModel : IPathModel {
     private var mPath: String = ""
     private var mListener: PathListener? = null
     private val mPathChain = ChainList<String>()
+    private val mPathStack = Stack<String>()
 
     init {
         checkCategoryPath()
         //init
         enter(STORAGE)
+    }
+
+    private fun save(): String {
+        return mPathStack.push(mPath)
+    }
+
+    private fun restore(): String {
+        if (mPathStack.isNotEmpty()) {
+            mPath = mPathStack.pop()
+        }
+        return mPath
     }
 
     override fun enter(category: Int): Boolean {
@@ -56,13 +70,46 @@ object PathModel : IPathModel {
     }
 
     private fun enter(path: String, push: Boolean) {
-        Log.i(TAG, "enter -> ${String}")
+        Log.i(TAG, "enter -> ${path}")
         mPath = path
         if (push) mPathChain.push(mPath)
         refresh()
         mListener?.stopWatching()
         mListener = PathListener(mPath)
         mListener?.startWatching()
+    }
+
+    fun startSearch(name: String): Any {
+        val thread = Thread(Runnable {
+            save()
+            val path = mPath
+            enter("Search", false)
+            search(path, name)
+        })
+        thread.start()
+        return thread
+    }
+
+    fun endSearch(token: Any?) {
+        if (token != null && token is Thread) {
+            token.interrupt()
+        }
+        enter(restore(), true)
+    }
+
+    private fun search(path: String, name: String) {
+        val root = PathUtils.get(path)
+        if (root == null || root.isFile()) return
+        val it = root.getFile().listFiles()?.iterator() ?: null ?: return
+        while (!Thread.interrupted() && it.hasNext()) {
+            val file = it.next()
+            if (file.name.contains(name)) {
+                //TODO : post result
+                EventBus.getInstance().post(ContentChangeEvent(INSERT, file.absolutePath))
+            } else if (file.isDirectory) {
+                search(file.absolutePath, name)
+            }
+        }
     }
 
     override fun getPath(): String = mPath
@@ -94,14 +141,17 @@ object PathModel : IPathModel {
             Log.i(TAG, "category top,ignore")
             return false
         }
-        return enter(File(mPath).parent)
+        val parent = File(mPath).parent ?: return false
+        return enter(parent)
     }
 
     override fun listFiles(): List<String> {
         val list = mutableListOf<String>()
-        File(mPath).listFiles().map {
-            list.add(it.path)
-        }
+        val files = File(mPath).listFiles()
+        if (files != null)
+            files.map {
+                list.add(it.path)
+            }
         val start = System.currentTimeMillis()
         Log.i(TAG, "find ${list.size} files, use ${System.currentTimeMillis() - start} ms")
         return list
@@ -166,7 +216,7 @@ object PathModel : IPathModel {
 
         fun getCurrent(): T = mList[mPoint]
 
-        fun havePrevious():Boolean = mPoint > 0
+        fun havePrevious(): Boolean = mPoint > 0
 
         fun movePrevious(): ChainList<T>? {
             Log.i(TAG, "movePrevious -> size=${mList.size},point=${mPoint}")
@@ -178,7 +228,7 @@ object PathModel : IPathModel {
             }
         }
 
-        fun haveNext():Boolean = mPoint < mList.size - 1
+        fun haveNext(): Boolean = mPoint < mList.size - 1
 
         fun moveNext(): ChainList<T>? {
             Log.i(TAG, "moveNext -> size=${mList.size},point=${mPoint}")

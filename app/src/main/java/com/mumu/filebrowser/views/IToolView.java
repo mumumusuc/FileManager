@@ -14,5 +14,5 @@ public interface IToolView {
 
     void enableAction(int action, boolean enable);
 
-    boolean cancelAllActions();
+    void showSearchWait(boolean show);
 }

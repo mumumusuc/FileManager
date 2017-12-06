@@ -1,42 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tool_search_root"
     android:layout_width="wrap_content"
-    android:id="@+id/action_search_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp">
 
-    <LinearLayout
-        android:id="@+id/action_search_root"
+    <ImageView
+        android:id="@+id/tool_search_icon"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_tool_search" />
+
+    <EditText
+        android:id="@+id/tool_search_input"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="8dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp">
+        android:hint="@string/tool_search_hint"
+        android:imeOptions="actionSearch"
+        android:singleLine="true"/>
 
-        <ImageView
-            android:id="@+id/action_search_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_tool_search" />
-
-        <EditText
-            android:id="@+id/action_search_edit"
-            style="@style/Base.Widget.AppCompat.EditText"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:hint="@string/tool_title_search"
-            android:imeOptions="actionSearch"
-            android:minWidth="300dp"
-            android:singleLine="true"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/action_search_clear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_tool_close"
-            android:visibility="gone" />
-    </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/tool_search_search"
+        style="@style/ToolTextTheme"
+        android:paddingEnd="0dp"
+        android:paddingStart="4dp"
+        android:text="@string/tool_title_search" />
+</LinearLayout>

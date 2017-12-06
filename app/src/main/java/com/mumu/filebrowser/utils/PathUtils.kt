@@ -113,4 +113,6 @@ class PathUtils(path: String) {
     fun getSnap() {
 
     }
+
+    fun getFile(): File = file
 }

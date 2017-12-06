@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.mumu.filebrowser.R
@@ -37,6 +38,7 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
     var mDialogView: View? = null
     var mEditor: EditText? = null
     var mMessage: TextView? = null
+    var mProgress: ProgressBar? = null
 
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -137,6 +139,7 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
         if (mDialog == null) {
             createDialog()
         }
+        mProgress?.visibility = GONE
         if (!title.isEmpty()) {
             mDialog?.setTitle(title)
         }
@@ -154,11 +157,25 @@ class OptionViewImpl : android.support.v7.widget.GridLayout, IOptionView, View.O
         }
     }
 
+    override fun showProgress(progress: Float) {
+        //showDialog("", null, null)
+        mProgress?.visibility = View.VISIBLE
+        showDialogMessage(null, false)
+        showDialogMessage(null, false)
+        mProgress?.progress = (progress * 100f).toInt()
+    }
+
+    override fun dismissProgress() {
+        dismissDialog()
+    }
+
+
     private fun createDialog() {
         val builder = AlertDialog.Builder(mContext)
         builder.setView(mDialogView)
         mEditor = mDialogView?.findViewById(R.id.dialog_editor)
         mMessage = mDialogView?.findViewById(R.id.dialog_message)
+        mProgress = mDialogView?.findViewById(R.id.dialog_progress)
         builder.setNegativeButton(resources.getString(R.string.opt_dialog_button_cancel), null);
         builder.setPositiveButton(resources.getString(R.string.opt_dialog_button_confirm), null);
         mDialog = builder.create()

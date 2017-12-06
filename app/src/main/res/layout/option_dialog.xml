@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="24dp">
 
     <EditText
         android:id="@+id/dialog_editor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:singleLine="true" />
 
     <TextView
         android:id="@+id/dialog_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_editor"
+        android:layout_marginTop="4dp"
         android:text="dialog_message"
         android:textColor="?attr/colorAccent" />
-</LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/dialog_progress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_message"
+
+        android:max="100" />
+</RelativeLayout>

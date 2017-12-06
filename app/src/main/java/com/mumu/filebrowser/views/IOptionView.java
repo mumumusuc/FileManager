@@ -33,5 +33,9 @@ public interface IOptionView {
 
     void dismissDialog();
 
+    void showProgress(float progress);
+
+    void dismissProgress();
+
     void enableOption(@Option int option, boolean enable);
 }
