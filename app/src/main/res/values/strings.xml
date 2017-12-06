@@ -46,4 +46,24 @@
     <string name="opt_name_delete">delete</string>
 
     <string name="empty">Empty</string>
+
+
+    <string name="tool_title_refresh">刷新</string>
+
+
+    <string name="overview_no_content">无预览图</string>
+
+
+    <string name="opt_dialog_button_confirm">OK</string>
+    <string name="opt_dialog_button_cancel">Cancel</string>
+
+    <string name="opt_msg_create">input file name</string>
+    <string name="opt_msg_delete">delete selected files?</string>
+    <string name="opt_msg_rename">input new file name</string>
+    <string name="opt_msg_paste">paste selected files here?</string>
+
+    <string name="opt_error_file_exist">file exist</string>
+    <string name="opt_error_bad_name">bad file name</string>
+
+    <string name="tool_search_hint">input file name</string>
 </resources>

@@ -23,6 +23,14 @@
     <string name="tool_title_selected">全选</string>
     <string name="tool_title_refresh">刷新</string>
 
+    <string name="menu_title_camera">@string/nav_name_camera</string>
+    <string name="menu_title_music">@string/nav_name_music</string>
+    <string name="menu_title_picture">@string/nav_name_picture</string>
+    <string name="menu_title_video">@string/nav_name_video</string>
+    <string name="menu_title_document">@string/nav_name_document</string>
+    <string name="menu_title_download">@string/nav_name_download</string>
+    <string name="menu_title_storage">@string/nav_name_storage</string>
+
     <string name="overview_file_name">当前文件：%s</string>
     <string name="overview_folder_name">当前文件夹：%s</string>
     <string name="overview_file_size">文件大小：%s</string>

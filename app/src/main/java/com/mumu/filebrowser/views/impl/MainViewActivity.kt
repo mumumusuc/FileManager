@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.*
 import com.mumu.filebrowser.Config
 import com.mumu.filebrowser.R
 import com.mumu.filebrowser.model.impl.PathModel
@@ -12,7 +11,6 @@ import com.mumu.filebrowser.views.*
 import com.mumu.filebrowser.presenter.IMainPresenter
 import com.mumu.filebrowser.presenter.IPresenter
 import com.mumu.filebrowser.presenter.impl.MainPresenterImpl
-import android.view.KeyEvent.KEYCODE_BACK
 import com.google.common.eventbus.Subscribe
 import com.mumu.filebrowser.eventbus.EventBus
 import com.mumu.filebrowser.eventbus.events.BackEvent
